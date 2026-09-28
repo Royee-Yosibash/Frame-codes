@@ -1,0 +1,6 @@
+measurements	Non_consecutive_powers_k_31	Non_consecutive_powers_k_30	Non_consecutive_powers_k_29	Circulant_Permutation_k_31	Circulant_Permutation_k_30	Circulant_Permutation_k_29	
+MSE & $1.58\cdot 10^{-19}$ & $2.37\cdot 10^{-19}$ & $1.99\cdot 10^{-18}$ & $1.58\cdot 10^{-19}$ & $2.37\cdot 10^{-19}$ & $1.93\cdot 10^{-18}$ \\
+$\frac{\|\widehat{\mathbf{A}\mathbf{x}} - \mathbf{A}\mathbf{x}\|_F}{\|\mathbf{A}\mathbf{x}\|_F}$ & $3.98\cdot 10^{-10}$ & $4.87\cdot 10^{-10}$ & $1.07\cdot 10^{-9}$ & $3.97\cdot 10^{-10}$ & $4.87\cdot 10^{-10}$ & $1.06\cdot 10^{-9}$ \\
+$mean(\kappa_{\mathbf{E}_{dec}})$ & $1$ & $3.93$ & $2.59$ & $1$ & $3.93$ & $2.28$ \\
+$min(\kappa_{\mathbf{E}_{dec}})$ & $1$ & $3.93$ & $1.22$ & $1$ & $3.93$ & $1.18$ \\
+$max(\kappa_{\mathbf{E}_{dec}})$ & $1$ & $3.93$ & $22.7$ & $1$ & $3.93$ & $54.5$ \\
