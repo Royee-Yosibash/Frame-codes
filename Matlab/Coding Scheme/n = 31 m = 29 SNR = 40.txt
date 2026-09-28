@@ -1,0 +1,6 @@
+measurements	Omitted_Vandermonde_k_30	Circulant_Permutation_k_30	Omitted_Vandermonde_k_31	Circulant_Permutation_k_31	
+$MSE$ & $2.42\cdot 10^{-15}$ & $2.42\cdot 10^{-15}$ & $1.61\cdot 10^{-15}$ & $1.61\cdot 10^{-15}$ \\
+$\frac{\|\widehat{\mathbf{A}\mathbf{x}} - \mathbf{A}\mathbf{x}\|_F}{\|\mathbf{A}\mathbf{x}\|_F}$ & $4.92\cdot 10^{-8}$ & $4.92\cdot 10^{-8}$ & $4.01\cdot 10^{-8}$ & $4.01\cdot 10^{-8}$ \\
+$mean(\kappa_{\mathbf{E}_{dec}})$ & $3.93$ & $3.93$ & $1$ & $1$ \\
+$min(\kappa_{\mathbf{E}_{dec}})$ & $3.93$ & $3.93$ & $1$ & $1$ \\
+$max(\kappa_{\mathbf{E}_{dec}})$ & $3.93$ & $3.93$ & $1$ & $1$ \\

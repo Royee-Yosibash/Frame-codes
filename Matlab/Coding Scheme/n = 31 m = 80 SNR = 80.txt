@@ -1,0 +1,6 @@
+measuresLatex	
+MSE \\
+$\frac{\|\widehat{\mathbf{A}\mathbf{x}} - \mathbf{A}\mathbf{x}\|_F}{\|\mathbf{A}\mathbf{x}\|_F}$ \\
+$mean(\kappa_{\mathbf{E}_{dec}})$ \\
+$min(\kappa_{\mathbf{E}_{dec}})$ \\
+$man(\kappa_{\mathbf{E}_{dec}})$ \\
