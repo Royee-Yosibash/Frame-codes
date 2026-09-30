@@ -49,6 +49,58 @@ The active MATLAB workflows to reproduce are:
 - Compare floating-point results with documented tolerances rather than exact
   equality.
 - Keep generated Python outputs separate from MATLAB outputs.
+- MATLAB-generated numerical fixtures are useful when available, but are not a
+  prerequisite for migration. Validate components through logical properties,
+  dimensional invariants, analytical expectations, and established results in
+  the literature; use direct MATLAB comparisons where feasible.
+
+### MATLAB reference contract
+
+- `getCode(n, m, codeType, CodeSubType, ...)` returns `transpose(genMatrix)`;
+  its documented output shape is `m x n`, while the generator used to encode a
+  length-`m` vector is `n x m`. The optional `permIdx` selects a construction
+  where supported; the implementation defaults it to zero (random selection).
+- The implemented code types are `Simple`, `BCH`, `LPF`, `BPF`, `Wishart`,
+  `Reed Solomon`, `Omitted Vandermonde`, `Non consecutive powers`,
+  `OrthoMatDot`, and `Circulant Permutation`. Reed-Solomon subtypes include
+  `None`, `Uniform sample`, `Random Set`, `Non-uniform sample`, and
+  `Multiple non-uniform sample`. Dimensions and toolbox availability are
+  type-specific; for example, Circulant Permutation requires even `n` and
+  dimensions paired in twos. The `.mlx` source contains no uniform validation
+  enforcing `m <= n` beyond its documentation.
+- `EncodingScheme` obtains `Code` in the orientation above, then sets
+  `EncodingMatA = transpose(Code)`, restoring generator orientation
+  (`nNodes x mForCodeA`). `encodeMatrix` partitions matrix rows or columns
+  evenly and forms each encoded part as a weighted sum using one encoding
+  matrix row. `FrameParameters` instead transposes `Code` and stores an
+  explicit inverse-based decoder derived from that frame matrix.
+- `FrameParameters` can normalize rows, columns, or neither. Its constructor
+  accepts scalar positive `M`, `N`, and `Gamma` (`Gamma <= 1`) and string
+  `Type`, `SubType`, and `normDim` values (`None`, `Row`, `Column`).
+- `FixMatricesDimensions` pads with zeros to achieve divisibility. OrthoMatDot
+  pads columns of A and rows of B based on their respective partition counts;
+  other active encoders pad rows of A and columns of B. Circulant Permutation
+  follows the latter rule with paired row/column encoding.
+- Gram eigenvalues are computed from `H' * H` when H is tall, otherwise
+  `H * H'` (`'` is MATLAB's conjugate transpose); the helper also returns
+  `cond(A)`. Coding-scheme condition-number statistics use an inverse for
+  square selected matrices; otherwise they calculate an explicit
+  pseudoinverse expression and take the square root of its Gram condition
+  number.
+- `compareCodesConfig.m` defaults are `numBits=8`, `mDataSets=[29]`,
+  `nNodes=[31]`, `SNR=[80]`, `numTrials=10000`, `N=2800`, `n2=1`, and code
+  types `Non consecutive powers` and `Circulant Permutation`. `compareCodes.m`
+  generates integer A and B entries in `[-51, 49]`, with A having
+  `22*mDataSets*30` rows, then measures MSE, relative Frobenius error, and
+  mean/min/max decoder condition numbers.
+- Decoding adds independent real Gaussian noise with variance
+  `10^(-SNR/10)` to each surviving coded result. Reported MSE is the mean of
+  `sum(abs(error).^2) / sum(abs(reconstruction).^2)`; relative Frobenius error
+  is `||error||_F / ||C||_F`.
+- `manovaPDF(x, beta, gamma)` and `marchenkoPasturPDF(x, beta)` normalize
+  sampled density values using `normPDF`; MANOVA may additionally transfer
+  mass to the grid point nearest `1/gamma`. Article-figure defaults include
+  `gamma=0.5`, `beta=0.8`, and 400-dimensional coded/Wishart examples.
 
 ## Proposed Python Layout
 
@@ -85,26 +137,7 @@ numerical utilities should remain separate from experiment drivers.
 
 ## Implementation Stages
 
-### 1. Establish the MATLAB reference contract
-
-- Record supported code types and their accepted dimensions.
-- Extract the exact input/output behavior of `getCode.mlx`.
-- Document whether returned matrices are generators, transposes, or frame
-  matrices at each call site.
-- Record default parameters, normalization rules, padding rules, and output
-  units.
-- Create small reference cases with saved matrices and numerical outputs.
-
-### 2. Set up the Python project
-
-- Add a minimal `pyproject.toml`.
-- Use NumPy for arrays and linear algebra.
-- Use SciPy where MATLAB behavior depends on specialized numerical routines.
-- Use Matplotlib for figures.
-- Use pandas only where table export is useful.
-- Keep runtime dependencies minimal and document supported Python versions.
-
-### 3. Port shared utilities
+### 1. Port shared utilities
 
 Port and test the utilities in this order:
 
@@ -116,10 +149,12 @@ Port and test the utilities in this order:
 6. PDF and empirical-distribution helpers.
 7. Frame parameter/statistics behavior.
 
-Each port should have a focused test against a MATLAB reference case before
-the next layer is implemented.
+Each port should have focused checks for its logical properties and
+dimensional invariants, and should be compared with MATLAB reference cases
+where feasible. Validate theoretical numerical routines against established
+literature results.
 
-### 4. Port coding-scheme experiments
+### 2. Port coding-scheme experiments
 
 - Port the defaults from `compareCodesConfig.m` into Python configuration.
 - Implement encoding and decoding without changing the current supported
@@ -129,7 +164,7 @@ the next layer is implemented.
 - Produce Python-specific output files under `Python/outputs/`.
 - Keep result columns and metric definitions compatible with the MATLAB tables.
 
-### 5. Port article/distribution figures
+### 3. Port article/distribution figures
 
 - Reproduce theoretical MANOVA and Marchenko-Pastur curves.
 - Reproduce coded-frame eigenvalue experiments.
@@ -137,7 +172,7 @@ the next layer is implemented.
 - Compare figures visually and compare sampled distributions numerically.
 - Do not overwrite figures under `Matlab/Results/`.
 
-### 6. Add parity and regression tests
+### 4. Add parity and regression tests
 
 Tests should cover:
 
@@ -152,7 +187,10 @@ Tests should cover:
 - Result-table fields and output paths.
 
 Use small matrices for fast tests and retain a separate, slower integration
-test for the full comparison workflow.
+test for the full comparison workflow. Where MATLAB reference output is not
+available, assert mathematical invariants and validate analytical/theoretical
+results against literature; use documented tolerances for numerical parity
+checks.
 
 ## Known Risks
 
