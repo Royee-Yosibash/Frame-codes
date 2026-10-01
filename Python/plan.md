@@ -34,27 +34,28 @@ The active MATLAB workflows to reproduce are:
    - Theoretical MANOVA and Marchenko-Pastur distributions.
    - Empirical eigenvalue simulations for coded and Wishart matrices.
 
-## Compatibility Rules
+## Porting Principles
 
 - Do not delete, move, or modify the MATLAB implementation as part of the
   Python port.
-- Treat MATLAB outputs and behavior as the compatibility reference.
-- Preserve matrix dimensions, row/column conventions, code transposition, and
-  normalization behavior exactly before improving the design.
+- Use MATLAB as an initial behavioral reference for understanding workflows,
+  not as a requirement for ongoing backwards compatibility.
+- Preserve mathematical intent and workflow requirements. Correct or improve
+  legacy implementation details when appropriate, documenting meaningful
+  behavioral differences.
 - Preserve the current default parameters from
   `Matlab/Coding Scheme/compareCodesConfig.m`.
 - Do not introduce a random seed into the default workflow unless it is an
   explicit opt-in. Random-number generation is currently part of the existing
   behavior.
-- Compare floating-point results with documented tolerances rather than exact
-  equality.
 - Keep generated Python outputs separate from MATLAB outputs.
 - MATLAB-generated numerical fixtures are useful when available, but are not a
   prerequisite for migration. Validate components through logical properties,
   dimensional invariants, analytical expectations, and established results in
-  the literature; use direct MATLAB comparisons where feasible.
+  the literature. Any MATLAB comparison is a one-time migration check, not an
+  ongoing compatibility test.
 
-### MATLAB reference contract
+### MATLAB implementation observations
 
 - `getCode(n, m, codeType, CodeSubType, ...)` returns `transpose(genMatrix)`;
   its documented output shape is `m x n`, while the generator used to encode a
@@ -111,58 +112,73 @@ Python/
   src/
     frame_codes/
       __init__.py
-      config.py
-      codes.py
-      frames.py
-      encoding.py
-      decoding.py
-      linear_algebra.py
-      distributions.py
-      metrics.py
+      numerics/
+        __init__.py
+        metrics.py
+        linear_algebra.py
+        distributions.py
+      frames/
+        __init__.py
+        codes.py
+        parameters.py
+      coding/
+        __init__.py
+        encoding.py
+        decoding.py
+      experiments/
+        __init__.py
+        compare_codes.py
+        article_figures.py
       results.py
-  scripts/
-    compare_codes.py
-    create_article_figures.py
   tests/
-    test_codes.py
-    test_encoding.py
-    test_decoding.py
-    test_distributions.py
-    test_metrics.py
+    unit_tests/
+      test_metrics.py
+      test_codes.py
+      test_encoding.py
+      test_decoding.py
+      test_distributions.py
   outputs/
 ```
 
-The exact module boundaries may be adjusted during implementation, but shared
-numerical utilities should remain separate from experiment drivers.
+Modules are grouped by responsibility; shared numerical utilities remain
+separate from coding workflows and experiment drivers.
 
 ## Implementation Stages
 
 ### 1. Port shared utilities
 
-Port and test the utilities in this order:
+Port utilities in dependency order, starting with the modules that can be
+checked independently:
 
-1. Matrix dimensions and partitioning.
-2. Code construction and normalization.
-3. Encoding.
-4. Gram-matrix eigenvalues and condition numbers.
-5. Error and norm metrics.
-6. PDF and empirical-distribution helpers.
-7. Frame parameter/statistics behavior.
+1. **Standalone linear algebra:** Gram-matrix eigenvalues and condition
+   numbers.
+2. **Standalone distributions:** PDF normalization, MANOVA and
+   Marchenko-Pastur densities, empirical eigenvalue histograms, and sampling
+   from a supplied distribution.
+3. **Matrix shape utilities:** zero-padding/dimension fixing and equal row or
+   column partitioning.
+4. **Code construction:** supported code matrices and normalization.
+5. **Encoding:** coded matrix partitions using the code matrices and shape
+   utilities.
+6. **Frame parameters/statistics:** this layer depends on code construction,
+   Gram-matrix calculations, and distribution/statistics helpers.
 
 Each port should have focused checks for its logical properties and
-dimensional invariants, and should be compared with MATLAB reference cases
-where feasible. Validate theoretical numerical routines against established
-literature results.
+dimensional invariants. Validate theoretical numerical routines against
+established literature results. If a utility has no dependency on other
+project modules, it may be moved earlier after confirming that its validation
+does not rely on unported behavior. MATLAB comparisons may be performed once
+during migration, but should not be repeated as backwards-compatibility tests.
 
 ### 2. Port coding-scheme experiments
 
 - Port the defaults from `compareCodesConfig.m` into Python configuration.
-- Implement encoding and decoding without changing the current supported
-  code paths.
+- Implement the intended encoding and decoding workflows for the currently
+  supported code types.
 - Preserve straggler selection, noise calculation, matrix padding, and code
   orientation.
 - Produce Python-specific output files under `Python/outputs/`.
-- Keep result columns and metric definitions compatible with the MATLAB tables.
+- Keep result fields and metric definitions consistent across Python workflows.
 
 ### 3. Port article/distribution figures
 
@@ -172,7 +188,7 @@ literature results.
 - Compare figures visually and compare sampled distributions numerically.
 - Do not overwrite figures under `Matlab/Results/`.
 
-### 4. Add parity and regression tests
+### 4. Add mathematical and workflow tests
 
 Tests should cover:
 
@@ -186,36 +202,35 @@ Tests should cover:
 - Distribution normalization and support.
 - Result-table fields and output paths.
 
-Use small matrices for fast tests and retain a separate, slower integration
-test for the full comparison workflow. Where MATLAB reference output is not
-available, assert mathematical invariants and validate analytical/theoretical
-results against literature; use documented tolerances for numerical parity
-checks.
+Use small matrices for fast unit tests and retain a separate, slower
+integration test for the full comparison workflow. Tests should assert
+mathematical invariants and intended workflow behavior. Do not encode legacy
+MATLAB quirks as ongoing compatibility requirements.
 
 ## Known Risks
 
 - `getCode.mlx` is the central dependency but is not currently a plain MATLAB
   function, so its complete behavior must be characterized before porting.
 - MATLAB and NumPy differ in default random-number generators and random
-  sampling behavior; numerical parity for stochastic experiments will require
-  controlled reference inputs or statistical tolerances.
+  sampling behavior; stochastic outputs should be validated statistically,
+  not expected to match sample-by-sample.
 - MATLAB uses 1-based indexing while Python uses 0-based indexing.
 - MATLAB's `transpose` and conjugate-transpose operations must remain distinct
   for complex-valued code matrices.
 - The MATLAB implementation uses explicit matrix inverses in several places;
-  the first Python port should reproduce results before considering more stable
-  linear solves.
+  prefer numerically stable linear solves where they preserve the intended
+  mathematical behavior.
 - Existing MATLAB scripts contain workspace and current-directory assumptions;
   the Python implementation should replace these with explicit function
-  inputs and output paths without changing the MATLAB behavior.
+  inputs and output paths.
 
 ## Completion Criteria
 
 The migration is complete when:
 
 - The MATLAB workflows remain intact and documented.
-- Python reproduces representative MATLAB numerical results within declared
-  tolerances.
+- Python's numerical components satisfy documented mathematical properties
+  and established analytical/theoretical expectations.
 - Python reproduces the active comparison metrics and distribution figures.
 - Python outputs are separated from MATLAB outputs.
 - Tests cover the shared utilities and both non-GUI workflows.

@@ -18,3 +18,4 @@ test = ["pytest>=7.4"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["frame_codes*"]
