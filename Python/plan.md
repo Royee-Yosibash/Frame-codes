@@ -43,6 +43,10 @@ The active MATLAB workflows to reproduce are:
 - Preserve mathematical intent and workflow requirements. Correct or improve
   legacy implementation details when appropriate, documenting meaningful
   behavioral differences.
+- Numerical utilities support NumPy integer, floating-point, and complex
+  inputs. Promote before arithmetic where required to avoid integer overflow
+  and use at least double precision for numerical linear algebra; exact
+  arithmetic is not promised for eigensolvers.
 - Preserve the current default parameters from
   `Matlab/Coding Scheme/compareCodesConfig.m`.
 - Do not introduce a random seed into the default workflow unless it is an
@@ -117,6 +121,9 @@ Python/
         metrics.py
         linear_algebra.py
         distributions.py
+      utils/
+        __init__.py
+        numpy_types.py
       frames/
         __init__.py
         codes.py
@@ -133,6 +140,7 @@ Python/
   tests/
     unit_tests/
       test_metrics.py
+      test_linear_algebra.py
       test_codes.py
       test_encoding.py
       test_decoding.py
@@ -150,17 +158,12 @@ separate from coding workflows and experiment drivers.
 Port utilities in dependency order, starting with the modules that can be
 checked independently:
 
-1. **Standalone linear algebra:** Gram-matrix eigenvalues and condition
-   numbers.
-2. **Standalone distributions:** PDF normalization, MANOVA and
-   Marchenko-Pastur densities, empirical eigenvalue histograms, and sampling
-   from a supplied distribution.
-3. **Matrix shape utilities:** zero-padding/dimension fixing and equal row or
+1. **Matrix shape utilities:** zero-padding/dimension fixing and equal row or
    column partitioning.
-4. **Code construction:** supported code matrices and normalization.
-5. **Encoding:** coded matrix partitions using the code matrices and shape
+2. **Code construction:** supported code matrices and normalization.
+3. **Encoding:** coded matrix partitions using the code matrices and shape
    utilities.
-6. **Frame parameters/statistics:** this layer depends on code construction,
+4. **Frame parameters/statistics:** this layer depends on code construction,
    Gram-matrix calculations, and distribution/statistics helpers.
 
 Each port should have focused checks for its logical properties and

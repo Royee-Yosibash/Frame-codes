@@ -3,6 +3,8 @@
 import numpy as np
 from numpy.typing import ArrayLike
 
+from frame_codes.utils.numpy_types import as_inexact_array
+
 
 def frobenius_norm(matrix: ArrayLike) -> float:
     """Calculate the Frobenius norm of a matrix.
@@ -13,7 +15,7 @@ def frobenius_norm(matrix: ArrayLike) -> float:
     Returns:
         The square root of the sum of the squared element magnitudes.
     """
-    values = np.asarray(matrix)
+    values = as_inexact_array(matrix)
     return float(np.sqrt(np.sum(np.abs(values) ** 2)))
 
 
@@ -32,7 +34,7 @@ def error_measurement(differences: ArrayLike, metric: str) -> float:
     Raises:
         ValueError: If the metric name is not supported.
     """
-    values = np.asarray(differences)
+    values = as_inexact_array(differences)
     normalized_metric = metric.upper()
 
     if normalized_metric == "L1":

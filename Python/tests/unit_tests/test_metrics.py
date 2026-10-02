@@ -22,6 +22,12 @@ class TestFrobeniusNorm(unittest.TestCase):
 
         self.assertEqual(frobenius_norm(matrix), 5.0)
 
+    def test_promotes_integer_values_before_squaring(self) -> None:
+        """Integer matrix values do not overflow during squaring."""
+        matrix = np.array([[50_000]], dtype=np.int32)
+
+        self.assertEqual(frobenius_norm(matrix), 50_000.0)
+
 
 class TestErrorMeasurement(unittest.TestCase):
     """Test mathematical error metric behavior."""
@@ -40,6 +46,10 @@ class TestErrorMeasurement(unittest.TestCase):
     def test_l2_sums_complex_error_magnitudes(self) -> None:
         """Complex errors contribute their squared magnitudes."""
         self.assertAlmostEqual(error_measurement([1 + 1j], "L2"), 2.0)
+
+    def test_l2_promotes_integer_values_before_squaring(self) -> None:
+        """Integer error values do not overflow during squaring."""
+        self.assertEqual(error_measurement([np.int32(50_000)], "L2"), 2.5e9)
 
     def test_rejects_unknown_metric(self) -> None:
         """Unknown metrics raise a clear value error."""
