@@ -4,7 +4,7 @@ from enum import StrEnum
 
 
 class CodeType(StrEnum):
-    """ Recognized code families."""
+    """Recognized code families."""
 
     LPF = "LPF"
     BPF = "BPF"
