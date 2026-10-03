@@ -59,16 +59,13 @@ def manova_pdf(
 ) -> NDArray[np.float64]:
     """Evaluate the continuous MANOVA density.
 
-    The returned density has total mass `1 - manova_atom_mass(beta, gamma)`.
-
     Args:
         sample_points: Points at which to evaluate the density.
         beta: Sub-frame aspect ratio.
         gamma: Frame aspect ratio.
 
     Returns:
-        Continuous density values with total mass `1 - manova_atom_mass`,
-        zero outside the MANOVA support.
+        Continuous density values, zero outside the MANOVA support.
 
     Raises:
         ValueError: If the aspect ratios do not satisfy
@@ -77,38 +74,23 @@ def manova_pdf(
     if not 0 < gamma <= beta <= 1:
         raise ValueError("MANOVA parameters must satisfy 0 < gamma <= beta <= 1")
     points = np.asarray(sample_points, dtype=np.float64)
+    density = np.zeros(points.shape, dtype=np.float64)
+    
     left = np.sqrt((1 - gamma) / beta)
     right = np.sqrt(1 - gamma / beta)
     lower = (left - right) ** 2
     upper = (left + right) ** 2
+    support = (points >= lower) & (points <= upper)
 
-    excess = gamma * (1 + 1 / beta) - 1
-    continuous_mass = (1 - float(excess / min(gamma, gamma / beta))) if excess > 0 else 0.0
-    density = np.zeros(points.shape, dtype=np.float64)
-    if continuous_mass == 0:
-        return density
-
-
+    continuous_mass = 1 - max(gamma * (1 + 1 / beta) - 1, 0) / min(gamma, gamma / beta)
     center = (lower + upper) / 2
     half_width = (upper - lower) / 2
-    reciprocal_gamma = 1 / gamma
-    root_at_zero = np.sqrt(lower * upper)
-    root_at_reciprocal = np.sqrt(
-        max((reciprocal_gamma - center) ** 2 - half_width**2, 0)
+    raw_mass = beta / 2 * (
+        1 / gamma
+        - np.sqrt(lower * upper)
+        - np.sqrt(max(( (1 / gamma) - center) ** 2 - half_width**2, 0))
     )
 
-    raw_mass = float(
-        beta
-        / 2
-        * (reciprocal_gamma - root_at_zero - root_at_reciprocal)
-    )
-
-    support = (
-        (points >= lower)
-        & (points <= upper)
-        & (points > 0)
-        & (1 - gamma * points > 0)
-    )
     density[support] = (
         beta
         * np.sqrt((points[support] - lower) * (upper - points[support]))
@@ -169,6 +151,5 @@ def sample_from_pdf(
     density = normalize_pdf(points, density_values)
     segment_mass = (density[:-1] + density[1:]) * np.diff(points) / 2
     cumulative_mass = np.concatenate(([0.0], np.cumsum(segment_mass)))
-    cumulative_mass /= cumulative_mass[-1]
     generator = np.random.default_rng() if rng is None else rng
     return np.interp(generator.random(sample_count), cumulative_mass, points)
