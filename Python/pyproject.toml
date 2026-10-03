@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "frame-codes"
+version = "0.1.0"
+description = "frame-code experiment workflows"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "matplotlib>=3.7",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7.4"]
+lint = ["ruff>=0.11"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["frame_codes*"]
