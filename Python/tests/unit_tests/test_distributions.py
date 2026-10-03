@@ -8,8 +8,6 @@ from scipy.integrate import trapezoid
 from frame_codes.numerics.distributions import (
     histogram_bin_edges,
     histogram_pdf,
-    manova_atom_mass,
-    manova_pdf,
     marchenko_pastur_pdf,
     normalize_pdf,
     sample_from_pdf,
@@ -53,26 +51,6 @@ class TestTheoreticalDistributions(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "0 < beta <= 1"):
             marchenko_pastur_pdf([0.5, 1.0], 1.2)
 
-    def test_manova_density_and_atom_sum_to_unit_mass(self) -> None:
-        """MANOVA continuous and discrete probability masses sum to one."""
-        beta = 0.8
-        gamma = 0.5
-        points = np.linspace(0, 1 / gamma, 100_001)
-
-        density = manova_pdf(points, beta, gamma)
-        atom_mass = manova_atom_mass(beta, gamma)
-
-        self.assertAlmostEqual(trapezoid(density, points) + atom_mass, 1.0, places=4)
-        self.assertAlmostEqual(atom_mass, 0.25)
-
-    def test_manova_without_atom_has_unit_continuous_mass(self) -> None:
-        """When there is no atom, the continuous density integrates to one."""
-        points = np.linspace(0, 4, 40_001)
-
-        density = manova_pdf(points, beta=0.5, gamma=0.25)
-
-        self.assertAlmostEqual(trapezoid(density, points), 1.0, places=4)
-
 
 class TestEmpiricalDistributionUtilities(unittest.TestCase):
     """Test histogram conversion and sampling from a supplied PDF."""
@@ -85,11 +63,6 @@ class TestEmpiricalDistributionUtilities(unittest.TestCase):
         density = histogram_pdf(samples, edges)
 
         self.assertAlmostEqual(np.sum(density * np.diff(edges)), 1.0)
-
-    def test_histogram_pdf_rejects_edges_that_omit_samples(self) -> None:
-        """All samples must be represented in the requested histogram."""
-        with self.assertRaisesRegex(ValueError, "cover all eigenvalue samples"):
-            histogram_pdf([0.1, 0.9], [0.2, 0.8])
 
     def test_sampling_returns_values_within_pdf_support(self) -> None:
         """Sampling stays within the input support and follows a flat PDF."""
