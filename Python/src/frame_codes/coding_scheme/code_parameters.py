@@ -1,9 +1,8 @@
 """Shared code dimensions and normalization settings."""
 
 from dataclasses import dataclass
-from typing import Literal
 
-NormDim = Literal["None", "Row", "Column"]
+from frame_codes.numerics.matrix_shapes import MatrixAxis
 
 
 @dataclass(frozen=True)
@@ -12,12 +11,12 @@ class CodeParameters:
 
     m: int
     n: int
-    norm_dim: NormDim = "None"
+    norm_dim: MatrixAxis | None = None
 
     def __post_init__(self) -> None:
         """Validate the normalization setting."""
-        if self.norm_dim not in {"None", "Row", "Column"}:
-            raise ValueError("norm_dim must be 'None', 'Row', or 'Column'")
+        if self.norm_dim not in {None, "row", "column"}:
+            raise ValueError("norm_dim must be None, 'row', or 'column'")
 
     @property
     def gamma(self) -> float:

@@ -13,21 +13,17 @@ class VandermondeCodeFamily(RandomCodeFamily):
 
     @staticmethod
     @cache
-    def _create_base_code(
-        n_nodes: int,
-        message_dimension: int,
-    ) -> NDArray[np.complex128]:
+    def _create_base_code(n: int) -> NDArray[np.complex128]:
         """Create and cache the full root-of-unity Vandermonde matrix.
 
         Args:
-            n_nodes: Number of available roots of unity.
-            message_dimension: Number of polynomial terms.
+            n: Number of available roots of unity and powers.
 
         Returns:
             A node-by-power Vandermonde matrix.
         """
-        roots = np.exp(-2j * np.pi * np.arange(n_nodes) / n_nodes)
-        powers = np.arange(message_dimension)
+        roots = np.exp(-2j * np.pi * np.arange(n) / n)
+        powers = np.arange(n)
         matrix = roots[:, np.newaxis] ** powers[np.newaxis, :]
         return matrix
 
@@ -36,16 +32,16 @@ class VandermondeCodeFamily(RandomCodeFamily):
         n: int,
         m: int,
     ) -> NDArray[np.complex128]:
-        """Select message-dimension rows from a cached Vandermonde matrix.
+        """Select nonconsecutive powers from a cached Vandermonde matrix.
 
         Args:
-            n: Number of available roots of unity.
-            m: Number of selected nodes and polynomial terms.
+            n: Number of available roots of unity and powers.
+            m: Number of powers to select.
 
         Returns:
-            A complex generator matrix with selected rows.
+            An `n`-by-`m` generator matrix with selected power columns.
         """
-        row_indices = np.sort(
+        power_indices = np.sort(
             self._rng.choice(n, size=m, replace=False)
         )
-        return self._create_base_code(n, m)[row_indices]
+        return self._create_base_code(n)[:, power_indices]

@@ -1,13 +1,10 @@
 """Linear algebra utilities for Gram matrices."""
 
-from typing import Literal
-
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
+from frame_codes.numerics.matrix_shapes import MatrixAxis
 from frame_codes.utils.numpy_types import as_inexact_array
-
-CodeAxis = Literal["row", "column"]
 
 
 def gram_matrix_eigenvalues(matrix: ArrayLike) -> NDArray[np.float64]:
@@ -59,7 +56,7 @@ def gram_matrix_condition_number(matrix: ArrayLike) -> float:
 
 def normalize_code(
     code: ArrayLike,
-    axis: CodeAxis,
+    axis: MatrixAxis,
 ) -> NDArray[np.float64] | NDArray[np.complex128]:
     """Normalize each row or column of a matrix to unit norm.
 
