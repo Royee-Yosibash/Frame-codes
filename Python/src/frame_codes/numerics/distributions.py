@@ -81,11 +81,28 @@ def manova_pdf(
     right = np.sqrt(1 - gamma / beta)
     lower = (left - right) ** 2
     upper = (left + right) ** 2
-    continuous_mass = 1 - manova_atom_mass(beta, gamma)
+
+    excess = gamma * (1 + 1 / beta) - 1
+    continuous_mass = (1 - float(excess / min(gamma, gamma / beta))) if excess > 0 else 0.0
     density = np.zeros(points.shape, dtype=np.float64)
     if continuous_mass == 0:
         return density
-    raw_mass = _manova_raw_continuous_mass(beta, gamma, lower, upper)
+
+
+    center = (lower + upper) / 2
+    half_width = (upper - lower) / 2
+    reciprocal_gamma = 1 / gamma
+    root_at_zero = np.sqrt(lower * upper)
+    root_at_reciprocal = np.sqrt(
+        max((reciprocal_gamma - center) ** 2 - half_width**2, 0)
+    )
+
+    raw_mass = float(
+        beta
+        / 2
+        * (reciprocal_gamma - root_at_zero - root_at_reciprocal)
+    )
+
     support = (
         (points >= lower)
         & (points <= upper)
@@ -99,58 +116,6 @@ def manova_pdf(
         * (continuous_mass / raw_mass)
     )
     return density
-
-
-def manova_atom_mass(beta: float, gamma: float) -> float:
-    """Calculate the MANOVA discrete mass at `1 / gamma`.
-
-    Args:
-        beta: Sub-frame aspect ratio.
-        gamma: Frame aspect ratio.
-
-    Returns:
-        Discrete probability mass, or zero if there is no atom.
-
-    Raises:
-        ValueError: If aspect ratios do not satisfy `0 < gamma <= beta <= 1`.
-    """
-    if not 0 < gamma <= beta <= 1:
-        raise ValueError("MANOVA parameters must satisfy 0 < gamma <= beta <= 1")
-    excess = gamma * (1 + 1 / beta) - 1
-    if excess <= 0:
-        return 0.0
-    return float(excess / min(gamma, gamma / beta))
-
-
-def _manova_raw_continuous_mass(
-    beta: float,
-    gamma: float,
-    lower: float,
-    upper: float,
-) -> float:
-    """Calculate the unscaled integral of the continuous MANOVA density.
-
-    Args:
-        beta: Sub-frame aspect ratio.
-        gamma: Frame aspect ratio.
-        lower: Lower support endpoint.
-        upper: Upper support endpoint.
-
-    Returns:
-        The total mass of the unscaled continuous density.
-    """
-    center = (lower + upper) / 2
-    half_width = (upper - lower) / 2
-    reciprocal_gamma = 1 / gamma
-    root_at_zero = np.sqrt(lower * upper)
-    root_at_reciprocal = np.sqrt(
-        max((reciprocal_gamma - center) ** 2 - half_width**2, 0)
-    )
-    return float(
-        beta
-        / 2
-        * (reciprocal_gamma - root_at_zero - root_at_reciprocal)
-    )
 
 
 def histogram_bin_edges(eigenvalues: ArrayLike, bins: int) -> NDArray[np.float64]:
