@@ -11,16 +11,16 @@ class WishartCodeFamily(RandomCodeFamily):
 
     def _create_code(
         self,
-        n_nodes: int,
-        message_dimension: int,
+        n: int,
+        m: int,
     ) -> NDArray[np.float64]:
         """Draw and normalize a real Gaussian code matrix.
 
         Args:
-            n_nodes: Number of encoded outputs.
-            message_dimension: Number of message elements.
+            n: Number of encoded outputs.
+            m: Number of message elements.
 
         Returns:
             A real Gaussian generator matrix.
         """
-        return self._rng.standard_normal((n_nodes, message_dimension)) / np.sqrt(n_nodes)
+        return self._rng.standard_normal((n, m)) / np.sqrt(n)

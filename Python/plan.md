@@ -121,12 +121,22 @@ Python/
         metrics.py
         linear_algebra.py
         distributions.py
+        matrix_shapes.py
       utils/
         __init__.py
         numpy_types.py
-      frames/
+      coding_scheme/
         __init__.py
-        codes.py
+        code_type.py
+        code_family.py
+        code_factory.py
+        codes/
+          __init__.py
+          fourier.py
+          wishart.py
+          vandermonde.py
+          orthomatdot.py
+          circulant_permutation.py
         parameters.py
       coding/
         __init__.py
@@ -145,6 +155,7 @@ Python/
       test_encoding.py
       test_decoding.py
       test_distributions.py
+      test_matrix_shapes.py
   outputs/
 ```
 
@@ -158,12 +169,9 @@ separate from coding workflows and experiment drivers.
 Port utilities in dependency order, starting with the modules that can be
 checked independently:
 
-1. **Matrix shape utilities:** zero-padding/dimension fixing and equal row or
-   column partitioning.
-2. **Code construction:** supported code matrices and normalization.
-3. **Encoding:** coded matrix partitions using the code matrices and shape
+1. **Encoding:** coded matrix partitions using the code matrices and shape
    utilities.
-4. **Frame parameters/statistics:** this layer depends on code construction,
+2. **Frame parameters/statistics:** this layer depends on code construction,
    Gram-matrix calculations, and distribution/statistics helpers.
 
 Each port should have focused checks for its logical properties and
@@ -214,6 +222,10 @@ MATLAB quirks as ongoing compatibility requirements.
 
 - `getCode.mlx` is the central dependency but is not currently a plain MATLAB
   function, so its complete behavior must be characterized before porting.
+- The Python code constructors cover code families used in the active
+  workflows and several NumPy-native families. BCH and Reed-Solomon
+  finite-field constructions are not implemented because the active workflows
+  do not use them and their MATLAB versions depend on Communications Toolbox.
 - MATLAB and NumPy differ in default random-number generators and random
   sampling behavior; stochastic outputs should be validated statistically,
   not expected to match sample-by-sample.

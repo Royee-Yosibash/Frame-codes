@@ -53,15 +53,15 @@ class CodeFamily(ABC):
         return self._create_code(n_nodes, message_dimension).copy()
 
     @abstractmethod
-    def _create_code(self, n_nodes: int, message_dimension: int) -> NDArray:
+    def _create_code(self, n: int, m: int) -> NDArray:
         """Construct the family-specific matrix.
 
         Args:
-            n_nodes: Number of encoded outputs.
-            message_dimension: Number of uncoded message elements.
+            n: Number of encoded outputs.
+            m: Number of uncoded message elements.
 
         Returns:
-            A code matrix with shape `(n_nodes, message_dimension)`.
+            A code matrix with shape `(n, m)`.
         """
 
 

@@ -28,8 +28,8 @@ class CirculantPermutationCodeFamily(CodeFamily):
     @staticmethod
     @cache
     def _create_code(
-        n_nodes: int,
-        message_dimension: int,
+        n: int,
+        m: int,
     ) -> NDArray[np.float64]:
         """Return the cached block rotation matrix.
 
@@ -41,10 +41,10 @@ class CirculantPermutationCodeFamily(CodeFamily):
             A real block rotation matrix.
 
         """
-        matrix = np.zeros((n_nodes, message_dimension), dtype=np.float64)
-        angle_step = 4 * np.pi / n_nodes
-        for row_block in range(n_nodes // 2):
-            for column_block in range(message_dimension // 2):
+        matrix = np.zeros((n, m), dtype=np.float64)
+        angle_step = 4 * np.pi / n
+        for row_block in range(n // 2):
+            for column_block in range(m // 2):
                 angle = angle_step * row_block * column_block
                 cosine = np.cos(angle)
                 sine = np.sin(angle)

@@ -33,19 +33,19 @@ class VandermondeCodeFamily(RandomCodeFamily):
 
     def _create_code(
         self,
-        n_nodes: int,
-        message_dimension: int,
+        n: int,
+        m: int,
     ) -> NDArray[np.complex128]:
         """Select message-dimension rows from a cached Vandermonde matrix.
 
         Args:
-            n_nodes: Number of available roots of unity.
-            message_dimension: Number of selected nodes and polynomial terms.
+            n: Number of available roots of unity.
+            m: Number of selected nodes and polynomial terms.
 
         Returns:
             A complex generator matrix with selected rows.
         """
         row_indices = np.sort(
-            self._rng.choice(n_nodes, size=message_dimension, replace=False)
+            self._rng.choice(n, size=m, replace=False)
         )
-        return self._create_base_code(n_nodes, message_dimension)[row_indices]
+        return self._create_base_code(n, m)[row_indices]

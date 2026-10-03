@@ -35,19 +35,19 @@ class LowPassFourierCodeFamily(FourierCodeFamily):
 
     def _create_code(
         self,
-        n_nodes: int,
-        message_dimension: int,
+        n: int,
+        m: int,
     ) -> NDArray[np.complex128]:
         """Select the first inverse-DFT columns.
 
         Args:
-            n_nodes: Number of encoded outputs.
-            message_dimension: Number of message elements.
+            n: Number of encoded outputs.
+            m: Number of message elements.
 
         Returns:
             A complex generator containing the first Fourier columns.
         """
-        return self._create_base_code(n_nodes)[:, :message_dimension]
+        return self._create_base_code(n)[:, :m]
 
 
 class BandPassFourierCodeFamily(FourierCodeFamily, RandomCodeFamily):
@@ -55,17 +55,17 @@ class BandPassFourierCodeFamily(FourierCodeFamily, RandomCodeFamily):
 
     def _create_code(
         self,
-        n_nodes: int,
-        message_dimension: int,
+        n: int,
+        m: int,
     ) -> NDArray[np.complex128]:
         """Select a random contiguous band from the inverse DFT matrix.
 
         Args:
-            n_nodes: Number of encoded outputs.
-            message_dimension: Number of message elements.
+            n: Number of encoded outputs.
+            m: Number of message elements.
 
         Returns:
             A complex generator containing the selected Fourier band.
         """
-        start = int(self._rng.integers(0, n_nodes - message_dimension + 1))
-        return self._create_base_code(n_nodes)[:, start : start + message_dimension]
+        start = int(self._rng.integers(0, n - m + 1))
+        return self._create_base_code(n)[:, start : start + m]
