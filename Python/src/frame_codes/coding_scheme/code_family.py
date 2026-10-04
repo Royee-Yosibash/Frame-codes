@@ -53,11 +53,10 @@ class CodeFamily(ABC):
         """
         self._validate_dimensions(parameters.n, parameters.m)
         code = self._create_code(parameters.n, parameters.m)
-        if parameters.norm_dim == "None":
+        if parameters.norm_dim is None:
             return code.copy()
         frame = code.T
-        axis = "row" if parameters.norm_dim == "Row" else "column"
-        return normalize_code(frame, axis).T
+        return normalize_code(frame, parameters.norm_dim).T
 
     @abstractmethod
     def _create_code(self, n: int, m: int) -> NDArray:

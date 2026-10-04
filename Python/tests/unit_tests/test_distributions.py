@@ -8,6 +8,7 @@ from scipy.integrate import trapezoid
 from frame_codes.numerics.distributions import (
     histogram_bin_edges,
     histogram_pdf,
+    manova_pdf,
     marchenko_pastur_pdf,
     normalize_pdf,
     sample_from_pdf,
@@ -34,6 +35,28 @@ class TestNormalizePDF(unittest.TestCase):
 
 class TestTheoreticalDistributions(unittest.TestCase):
     """Test theoretical density support and probability mass."""
+
+    def test_manova_density_has_unit_mass_when_no_atom_exists(self) -> None:
+        """The continuous MANOVA density integrates to one without an atom."""
+        points = np.linspace(0, 4, 40_001)
+
+        density = manova_pdf(points, beta=0.5, gamma=0.25)
+
+        self.assertAlmostEqual(trapezoid(density, points), 1.0, places=4)
+        self.assertEqual(density[0], 0.0)
+        self.assertEqual(density[-1], 0.0)
+
+    def test_manova_density_adds_atom_to_nearest_sample(self) -> None:
+        """The MANOVA atom is added after normalizing the continuous density."""
+        points = np.linspace(0, 2.5, 25_001)
+
+        density = manova_pdf(points, beta=0.8, gamma=0.5)
+
+        atom_index = int(np.argmin(np.abs(points - 2.0)))
+        self.assertEqual(density[atom_index], 0.25)
+        continuous_density = density.copy()
+        continuous_density[atom_index] = 0.0
+        self.assertAlmostEqual(trapezoid(continuous_density, points), 0.75, places=4)
 
     def test_marchenko_pastur_density_has_unit_mass_and_expected_support(self) -> None:
         """The beta-below-one MP density integrates to one on its support."""
