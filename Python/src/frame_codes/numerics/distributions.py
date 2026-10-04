@@ -65,7 +65,7 @@ def manova_pdf(
         gamma: Frame aspect ratio.
 
     Returns:
-        Continuous density values, zero outside the MANOVA support.
+        MANOVA density values at the points.
 
     Raises:
         ValueError: If the aspect ratios do not satisfy
@@ -75,28 +75,24 @@ def manova_pdf(
         raise ValueError("MANOVA parameters must satisfy 0 < gamma <= beta <= 1")
     points = np.asarray(sample_points, dtype=np.float64)
     density = np.zeros(points.shape, dtype=np.float64)
-    
+
     left = np.sqrt((1 - gamma) / beta)
     right = np.sqrt(1 - gamma / beta)
-    lower = (left - right) ** 2
-    upper = (left + right) ** 2
-    support = (points >= lower) & (points <= upper)
-
-    continuous_mass = 1 - max(gamma * (1 + 1 / beta) - 1, 0) / min(gamma, gamma / beta)
-    center = (lower + upper) / 2
-    half_width = (upper - lower) / 2
-    raw_mass = beta / 2 * (
-        1 / gamma
-        - np.sqrt(lower * upper)
-        - np.sqrt(max(( (1 / gamma) - center) ** 2 - half_width**2, 0))
+    r_minus = (left - right) ** 2
+    r_plus = (left + right) ** 2
+    support = (points >= r_minus) & (points <= r_plus)
+    above_fraction = beta * np.sqrt(
+        (points[support] - r_minus) * (r_plus - points[support])
     )
+    below_fraction = (2 * np.pi * points[support]) * (1 - gamma * points[support])
+    density[support] = above_fraction / below_fraction
+    density = normalize_pdf(points, density)
 
-    density[support] = (
-        beta
-        * np.sqrt((points[support] - lower) * (upper - points[support]))
-        / (2 * np.pi * points[support] * (1 - gamma * points[support]))
-        * (continuous_mass / raw_mass)
-    )
+    atom_mass = (gamma * (1 + 1 / beta) - 1) / min(gamma, gamma / beta)
+    if atom_mass > 0:
+        atom_index = np.abs(points - 1 / gamma).argmin()
+        density = density * (1 - atom_mass)
+        density.flat[atom_index] += atom_mass
     return density
 
 
