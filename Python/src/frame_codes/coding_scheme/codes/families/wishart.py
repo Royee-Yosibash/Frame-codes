@@ -1,13 +1,13 @@
-"""Wishart-style Gaussian code family."""
+"""Wishart-style Gaussian code families."""
 
 import numpy as np
 from numpy.typing import NDArray
 
-from frame_codes.coding_scheme.code_family import RandomCodeFamily
+from frame_codes.coding_scheme.codes.code_family import RandomCodeFamily
 
 
 class WishartCodeFamily(RandomCodeFamily):
-    """Real Gaussian code family with node-count normalization."""
+    """Real Gaussian code families with node-count normalization."""
 
     def _create_code(
         self,

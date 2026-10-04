@@ -1,4 +1,4 @@
-"""Recognized frame-code family names."""
+"""Code families names."""
 
 from enum import StrEnum
 

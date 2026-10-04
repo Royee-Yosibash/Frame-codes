@@ -5,7 +5,7 @@ from functools import cache
 import numpy as np
 from numpy.typing import NDArray
 
-from frame_codes.coding_scheme.code_family import CodeFamily, RandomCodeFamily
+from frame_codes.coding_scheme.codes.code_family import CodeFamily, RandomCodeFamily
 
 
 class FourierCodeFamily(CodeFamily, ABC):
@@ -31,7 +31,7 @@ class FourierCodeFamily(CodeFamily, ABC):
 
 
 class LowPassFourierCodeFamily(FourierCodeFamily):
-    """Deterministic low-pass Fourier code family."""
+    """Deterministic low-pass Fourier code families."""
 
     def _create_code(
         self,
@@ -51,7 +51,7 @@ class LowPassFourierCodeFamily(FourierCodeFamily):
 
 
 class BandPassFourierCodeFamily(FourierCodeFamily, RandomCodeFamily):
-    """Fourier code family using a random contiguous frequency band."""
+    """Fourier code families using a random contiguous frequency band."""
 
     def _create_code(
         self,

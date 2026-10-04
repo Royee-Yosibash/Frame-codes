@@ -1,15 +1,15 @@
-"""Block rotation code family for circulant permutation coding."""
+"""Block rotation code families for circulant permutation coding."""
 
 from functools import cache
 
 import numpy as np
 from numpy.typing import NDArray
 
-from frame_codes.coding_scheme.code_family import CodeFamily
+from frame_codes.coding_scheme.codes.code_family import CodeFamily
 
 
 class CirculantPermutationCodeFamily(CodeFamily):
-    """Block rotation code family."""
+    """Block rotation code families."""
 
     def _validate_dimensions(self, n_nodes: int, message_dimension: int) -> None:
         """Require even dimensions for paired rotations.

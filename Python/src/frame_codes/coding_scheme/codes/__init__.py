@@ -1,1 +1,1 @@
-"""Concrete code-family implementations."""
+"""Code types, parameters, families, and constructors."""

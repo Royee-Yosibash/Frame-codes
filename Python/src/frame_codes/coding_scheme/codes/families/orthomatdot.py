@@ -1,15 +1,15 @@
-"""Chebyshev polynomial code family used by OrthoMatDot."""
+"""Chebyshev polynomial code families used by OrthoMatDot."""
 
 from functools import cache
 
 import numpy as np
 from numpy.typing import NDArray
 
-from frame_codes.coding_scheme.code_family import CodeFamily
+from frame_codes.coding_scheme.codes.code_family import CodeFamily
 
 
 class OrthoMatDotCodeFamily(CodeFamily):
-    """Chebyshev polynomial evaluation code family."""
+    """Chebyshev polynomial evaluation code families."""
 
     @staticmethod
     @cache

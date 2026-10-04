@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 from numpy.typing import NDArray
 
-from frame_codes.coding_scheme.code_parameters import CodeParameters
+from frame_codes.coding_scheme.codes.parameters import CodeParameters
 from frame_codes.numerics.linear_algebra import normalize_code
 
 
@@ -48,7 +48,7 @@ class CodeFamily(ABC):
         Raises:
             TypeError: If either dimension is not an integer.
             ValueError: If dimensions are not positive, message dimension
-                exceeds node count, or the selected family has more specific
+                exceeds node count, or the selected families has more specific
                 dimension requirements.
         """
         self._validate_dimensions(parameters.n, parameters.m)
@@ -60,7 +60,7 @@ class CodeFamily(ABC):
 
     @abstractmethod
     def _create_code(self, n: int, m: int) -> NDArray:
-        """Construct the family-specific matrix.
+        """Construct the families-specific matrix.
 
         Args:
             n: Number of encoded outputs.
@@ -75,7 +75,7 @@ class RandomCodeFamily(CodeFamily):
     """Base class for families that use randomized construction."""
 
     def __init__(self, rng: np.random.Generator | None = None) -> None:
-        """Initialize a random code family.
+        """Initialize a random code families.
 
         Args:
             rng: Optional NumPy random generator. A fresh unseeded generator

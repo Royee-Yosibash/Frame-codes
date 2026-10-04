@@ -1,1 +1,1 @@
-"""Code-family selection and construction interfaces."""
+"""Code-families selection and construction interfaces."""

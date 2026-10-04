@@ -1,15 +1,15 @@
-"""Random row-selected root-of-unity Vandermonde code family."""
+"""Random row-selected root-of-unity Vandermonde code families."""
 
 from functools import cache
 
 import numpy as np
 from numpy.typing import NDArray
 
-from frame_codes.coding_scheme.code_family import RandomCodeFamily
+from frame_codes.coding_scheme.codes.code_family import RandomCodeFamily
 
 
 class VandermondeCodeFamily(RandomCodeFamily):
-    """Root-of-unity Vandermonde family with random row selection."""
+    """Root-of-unity Vandermonde families with random row selection."""
 
     @staticmethod
     @cache
