@@ -6,41 +6,39 @@ import numpy as np
 from numpy.typing import NDArray
 
 from frame_codes.coding_scheme.codes.code_family import CodeFamily
+from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 
 
 class CirculantPermutationCodeFamily(CodeFamily):
     """Block rotation code families."""
 
-    def _validate_dimensions(self, n_nodes: int, message_dimension: int) -> None:
+    def _validate_parameters(self, parameters: CodeParameters) -> None:
         """Require even dimensions for paired rotations.
 
         Args:
-            n_nodes: Number of encoded outputs.
-            message_dimension: Number of uncoded message elements.
+            parameters: Code dimensions and normalization setting.
 
         Raises:
             ValueError: If either dimension is odd.
         """
-        super()._validate_dimensions(n_nodes, message_dimension)
-        if n_nodes % 2 or message_dimension % 2:
+        super()._validate_parameters(parameters)
+        if parameters.n % 2 or parameters.m % 2:
             raise ValueError("Circulant Permutation requires even code dimensions")
 
     @staticmethod
     @cache
-    def _create_code(
-        n: int,
-        m: int,
-    ) -> NDArray[np.float64]:
+    def _create_code(parameters: CodeParameters) -> NDArray[np.float64]:
         """Return the cached block rotation matrix.
 
         Args:
-            n_nodes: Number of encoded outputs; must be even.
-            message_dimension: Number of message elements; must be even.
+            parameters: Shared code dimensions and normalization setting.
 
         Returns:
             A real block rotation matrix.
 
         """
+        n = parameters.n
+        m = parameters.m
         matrix = np.zeros((n, m), dtype=np.float64)
         angle_step = 4 * np.pi / n
         for row_block in range(n // 2):

@@ -6,6 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from frame_codes.coding_scheme.codes.code_family import RandomCodeFamily
+from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 
 
 class VandermondeCodeFamily(RandomCodeFamily):
@@ -29,19 +30,17 @@ class VandermondeCodeFamily(RandomCodeFamily):
 
     def _create_code(
         self,
-        n: int,
-        m: int,
+        parameters: CodeParameters,
     ) -> NDArray[np.complex128]:
         """Select nonconsecutive powers from a cached Vandermonde matrix.
 
         Args:
-            n: Number of available roots of unity and powers.
-            m: Number of powers to select.
+            parameters: Shared dimensions and normalization setting.
 
         Returns:
             An `n`-by-`m` generator matrix with selected power columns.
         """
         power_indices = np.sort(
-            self._rng.choice(n, size=m, replace=False)
+            self._rng.choice(parameters.n, size=parameters.m, replace=False)
         )
-        return self._create_base_code(n)[:, power_indices]
+        return self._create_base_code(parameters.n)[:, power_indices]

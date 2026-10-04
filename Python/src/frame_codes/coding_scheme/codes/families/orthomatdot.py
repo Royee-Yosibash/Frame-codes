@@ -6,6 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from frame_codes.coding_scheme.codes.code_family import CodeFamily
+from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 
 
 class OrthoMatDotCodeFamily(CodeFamily):
@@ -13,19 +14,17 @@ class OrthoMatDotCodeFamily(CodeFamily):
 
     @staticmethod
     @cache
-    def _create_code(
-        n: int,
-        m: int,
-    ) -> NDArray[np.float64]:
+    def _create_code(parameters: CodeParameters) -> NDArray[np.float64]:
         """Return the cached Chebyshev evaluation matrix.
 
         Args:
-            n: Number of Chebyshev evaluation nodes.
-            m: Number of polynomial terms.
+            parameters: Shared code dimensions and normalization setting.
 
         Returns:
             A real node-by-polynomial matrix.
         """
+        n = parameters.n
+        m = parameters.m
         nodes = np.cos((2 * np.arange(n) + 1) * np.pi / (2 * n))
         matrix = np.empty((n, m), dtype=np.float64)
         matrix[:, 0] = 1

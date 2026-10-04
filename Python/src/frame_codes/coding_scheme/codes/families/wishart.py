@@ -4,6 +4,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from frame_codes.coding_scheme.codes.code_family import RandomCodeFamily
+from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 
 
 class WishartCodeFamily(RandomCodeFamily):
@@ -11,16 +12,16 @@ class WishartCodeFamily(RandomCodeFamily):
 
     def _create_code(
         self,
-        n: int,
-        m: int,
+        parameters: CodeParameters,
     ) -> NDArray[np.float64]:
         """Draw and normalize a real Gaussian code matrix.
 
         Args:
-            n: Number of encoded outputs.
-            m: Number of message elements.
+            parameters: Shared code dimensions and normalization setting.
 
         Returns:
             A real Gaussian generator matrix.
         """
-        return self._rng.standard_normal((n, m)) / np.sqrt(n)
+        return self._rng.standard_normal((parameters.n, parameters.m)) / np.sqrt(
+            parameters.n
+        )

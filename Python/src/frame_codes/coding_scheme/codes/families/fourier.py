@@ -6,6 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from frame_codes.coding_scheme.codes.code_family import CodeFamily, RandomCodeFamily
+from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 
 
 class FourierCodeFamily(CodeFamily, ABC):
@@ -35,19 +36,17 @@ class LowPassFourierCodeFamily(FourierCodeFamily):
 
     def _create_code(
         self,
-        n: int,
-        m: int,
+        parameters: CodeParameters,
     ) -> NDArray[np.complex128]:
         """Select the first inverse-DFT columns.
 
         Args:
-            n: Number of encoded outputs.
-            m: Number of message elements.
+            parameters: Shared dimensions and normalization setting.
 
         Returns:
             A complex generator containing the first Fourier columns.
         """
-        return self._create_base_code(n)[:, :m]
+        return self._create_base_code(parameters.n)[:, : parameters.m]
 
 
 class BandPassFourierCodeFamily(FourierCodeFamily, RandomCodeFamily):
@@ -55,17 +54,15 @@ class BandPassFourierCodeFamily(FourierCodeFamily, RandomCodeFamily):
 
     def _create_code(
         self,
-        n: int,
-        m: int,
+        parameters: CodeParameters,
     ) -> NDArray[np.complex128]:
         """Select a random contiguous band from the inverse DFT matrix.
 
         Args:
-            n: Number of encoded outputs.
-            m: Number of message elements.
+            parameters: Shared dimensions and normalization setting.
 
         Returns:
             A complex generator containing the selected Fourier band.
         """
-        start = int(self._rng.integers(0, n - m + 1))
-        return self._create_base_code(n)[:, start : start + m]
+        start = int(self._rng.integers(0, parameters.n - parameters.m + 1))
+        return self._create_base_code(parameters.n)[:, start : start + parameters.m]
