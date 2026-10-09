@@ -3,19 +3,14 @@
 from collections.abc import Sequence
 
 from frame_codes.coding_scheme.codes.code_family import CodeFamily
-from frame_codes.coding_scheme.encoding.encoded_information import (
-    EncodedInformation,
-    WeightedInformation,
-)
-
-__all__ = ["Encoder", "EncodedInformation", "WeightedInformation"]
+from frame_codes.coding_scheme.state_utils.encoded_information import EncodedInformation
 
 
 class Encoder:
     """Assign code-weighted information to identified workers."""
 
+    @staticmethod
     def encode(
-        self,
         information_set: Sequence,
         code_family: CodeFamily,
     ) -> list[EncodedInformation]:
@@ -35,6 +30,7 @@ class Encoder:
         """
         worker_count = code_family.number_of_workers_required()
         return [
-            code_family.encode_for_worker(worker_id, information_set)
+            EncodedInformation(information_id=worker_id,
+                               information=code_family.encode_for_worker(worker_id, information_set))
             for worker_id in range(worker_count)
         ]

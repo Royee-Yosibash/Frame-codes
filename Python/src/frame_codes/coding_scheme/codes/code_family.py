@@ -4,15 +4,10 @@ from abc import ABC, abstractmethod
 from collections.abc import Sequence
 
 import numpy as np
-from _pytest._code import Code
 from numpy.typing import NDArray
 
 from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
-from frame_codes.coding_scheme.encoding.encoded_information import (
-    EncodedInformation,
-    WeightedInformation,
-)
-from frame_codes.utils.numpy_types import as_inexact_array
+from frame_codes.coding_scheme.state_utils.encoded_information import WeightedInformation
 
 
 class CodeFamily(ABC):
@@ -73,7 +68,7 @@ class CodeFamily(ABC):
         self,
         worker_id: int,
         information_set: Sequence,
-    ) -> EncodedInformation:
+    ) -> list[list[WeightedInformation]]:
         """Encode information items for one worker using this family's code.
 
         Args:
@@ -104,7 +99,7 @@ class CodeFamily(ABC):
         for item, coefficients in zip(information_set, coefficients_by_set):
             for row, coefficient in zip(information, coefficients):
                 row.append(WeightedInformation(item, coefficient.item()))
-        return EncodedInformation(worker_id, information)
+        return information
 
     @abstractmethod
     def _generate_new_code(self, parameters: CodeParameters) -> NDArray:
