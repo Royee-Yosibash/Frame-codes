@@ -12,37 +12,67 @@ from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 class CirculantPermutationCodeFamily(CodeFamily):
     """Block rotation code families."""
 
-    def _validate_parameters(self, parameters: CodeParameters) -> None:
-        """Require even dimensions for paired rotations.
+    @staticmethod
+    def _validate_code(code: NDArray, parameters: CodeParameters) -> None:
+        """Validate the expanded code shape for paired rows and columns.
 
         Args:
-            parameters: Code dimensions and normalization setting.
+            code: Generated code matrix.
+            parameters: Information-set and worker counts.
 
         Raises:
-            ValueError: If either dimension is odd.
+            ValueError: If the matrix does not have two rows per worker and
+                two columns per information set.
         """
-        super()._validate_parameters(parameters)
-        if parameters.n % 2 or parameters.m % 2:
-            raise ValueError("Circulant Permutation requires even code dimensions")
+        if code.shape != (2 * parameters.n, 2 * parameters.m):
+            raise ValueError(
+                "Code shape must have two rows per worker and two columns per information set"
+            )
+
+    def number_of_workers_required(self) -> int:
+        """Return the number of workers represented by the code.
+
+        Returns:
+            Half the number of code rows, since each worker owns a row pair.
+        """
+        return self.get_code().shape[0] // 2
+
+    def _get_coefficient_per_set(
+        self,
+        worker_id: int,
+        set_index: int,
+    ) -> NDArray[np.float64]:
+        """Return the coefficient pair for one set and worker.
+
+        Args:
+            worker_id: Zero-based worker identifier.
+            set_index: Column index of the encoded set.
+
+        Returns:
+            Coefficients from the worker's adjacent code rows.
+        """
+        code = self.get_code()
+        first_row = 2 * worker_id
+        return code[first_row : first_row + 2, set_index]
 
     @staticmethod
     @cache
-    def _create_code(parameters: CodeParameters) -> NDArray[np.float64]:
-        """Return the cached block rotation matrix.
+    def _generate_new_code(parameters: CodeParameters) -> NDArray[np.float64]:
+        """Return the block rotation matrix with two rows per worker.
 
         Args:
-            parameters: Shared code dimensions and normalization setting.
+            parameters: Number of information sets and workers.
 
         Returns:
-            A real block rotation matrix.
+            A real block rotation matrix with shape `(2 * n, 2 * m)`.
 
         """
-        n = parameters.n
-        m = parameters.m
-        matrix = np.zeros((n, m), dtype=np.float64)
-        angle_step = 4 * np.pi / n
-        for row_block in range(n // 2):
-            for column_block in range(m // 2):
+        row_count = 2 * parameters.n
+        column_count = 2 * parameters.m
+        matrix = np.zeros((row_count, column_count), dtype=np.float64)
+        angle_step = 4 * np.pi / row_count
+        for row_block in range(parameters.n):
+            for column_block in range(parameters.m):
                 angle = angle_step * row_block * column_block
                 cosine = np.cos(angle)
                 sine = np.sin(angle)

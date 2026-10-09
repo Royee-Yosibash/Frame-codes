@@ -10,7 +10,7 @@ from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 class WishartCodeFamily(RandomCodeFamily):
     """Real Gaussian code families with node-count normalization."""
 
-    def _create_code(
+    def _generate_new_code(
         self,
         parameters: CodeParameters,
     ) -> NDArray[np.float64]:

@@ -139,7 +139,7 @@ def _collect_coded_frame_eigenvalues(
     frame = create_code_family(
         CodeType.OMITTED_VANDERMONDE,
         rng,
-    ).create_code(CodeParameters(m=m, n=config.n, norm_dim="column")).T
+    ).generate_code(CodeParameters(m=m, n=config.n, norm_dim="column")).T
     retained_count = int(np.floor(m / config.beta + 0.5))
     eigenvalues = []
     for _ in range(config.coded_trials):
@@ -168,7 +168,7 @@ def _collect_wishart_eigenvalues(
     code_parameters = CodeParameters(m=m, n=n)
     eigenvalues = []
     for _ in range(num_trials):
-        matrix = create_code_family(CodeType.WISHART, rng).create_code(code_parameters).T
+        matrix = create_code_family(CodeType.WISHART, rng).generate_code(code_parameters).T
         eigenvalues.append(gram_matrix_eigenvalues(matrix))
     return np.concatenate(eigenvalues)
 

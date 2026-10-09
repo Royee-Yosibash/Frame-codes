@@ -14,7 +14,7 @@ class OrthoMatDotCodeFamily(CodeFamily):
 
     @staticmethod
     @cache
-    def _create_code(parameters: CodeParameters) -> NDArray[np.float64]:
+    def _generate_new_code(parameters: CodeParameters) -> NDArray[np.float64]:
         """Return the cached Chebyshev evaluation matrix.
 
         Args:

@@ -28,7 +28,7 @@ class VandermondeCodeFamily(RandomCodeFamily):
         matrix = roots[:, np.newaxis] ** powers[np.newaxis, :]
         return matrix
 
-    def _create_code(
+    def _generate_new_code(
         self,
         parameters: CodeParameters,
     ) -> NDArray[np.complex128]:

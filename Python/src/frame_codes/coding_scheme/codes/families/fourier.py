@@ -34,7 +34,7 @@ class FourierCodeFamily(CodeFamily, ABC):
 class LowPassFourierCodeFamily(FourierCodeFamily):
     """Deterministic low-pass Fourier code families."""
 
-    def _create_code(
+    def _generate_new_code(
         self,
         parameters: CodeParameters,
     ) -> NDArray[np.complex128]:
@@ -52,7 +52,7 @@ class LowPassFourierCodeFamily(FourierCodeFamily):
 class BandPassFourierCodeFamily(FourierCodeFamily, RandomCodeFamily):
     """Fourier code families using a random contiguous frequency band."""
 
-    def _create_code(
+    def _generate_new_code(
         self,
         parameters: CodeParameters,
     ) -> NDArray[np.complex128]:

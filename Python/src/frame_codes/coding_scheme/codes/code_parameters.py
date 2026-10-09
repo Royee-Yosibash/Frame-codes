@@ -11,8 +11,9 @@ from frame_codes.numerics.matrix_shapes import MatrixAxis
 class CodeParameters:
     """Frame dimensions and normalization shared by code and experiment APIs."""
 
-    m: int
-    n: int
+    m: int  # Number of distinct information sets
+    n: int  # Number of workers
+
     norm_dim: MatrixAxis | None = None
 
     def __post_init__(self) -> None:
