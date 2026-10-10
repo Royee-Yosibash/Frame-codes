@@ -8,6 +8,7 @@ from numpy.typing import NDArray
 
 from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 from frame_codes.coding_scheme.state_utils.encoded_information import WeightedInformation
+from frame_codes.numerics.linear_algebra import normalize_code
 
 
 class CodeFamily(ABC):
@@ -40,7 +41,7 @@ class CodeFamily(ABC):
     def get_code(self) -> NDArray:
         if self._current_code is None:
             raise AttributeError("No code has been generated.")
-        return self._current_code
+        return self._current_code.copy()
 
     def number_of_encoded_sets(self):
         return self.get_code().shape[1]
@@ -112,14 +113,16 @@ class CodeFamily(ABC):
             A code matrix with shape `(parameters.n, parameters.m)`.
         """
 
-    def generate_code(self, parameters: CodeParameters):
-        """Create a new code matrix using code parameters.
+    def generate_code(self, parameters: CodeParameters) -> None:
+        """Generate and store a code matrix.
 
         Args:
             parameters: Code dimensions and normalization setting.
         """
         self._validate_parameters(parameters)
         code = self._generate_new_code(parameters)
+        if parameters.norm_dim is not None:
+            code = normalize_code(code.T, parameters.norm_dim).T
         self._update_code(code, parameters)
 
 

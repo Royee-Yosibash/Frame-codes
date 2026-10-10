@@ -5,6 +5,8 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy.typing import NDArray
+
 from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 from frame_codes.coding_scheme.codes.code_type import CodeType
 from frame_codes.coding_scheme.codes.factory import create_code_family
@@ -14,7 +16,6 @@ from frame_codes.numerics.distributions import (
     marchenko_pastur_pdf,
 )
 from frame_codes.numerics.linear_algebra import gram_matrix_eigenvalues
-from numpy.typing import NDArray
 
 
 @dataclass(frozen=True)
@@ -136,10 +137,12 @@ def _collect_coded_frame_eigenvalues(
     Returns:
         A flat array of Gram-matrix eigenvalues from all coded trials.
     """
-    frame = create_code_family(
+    family = create_code_family(
         CodeType.OMITTED_VANDERMONDE,
         rng,
-    ).generate_code(CodeParameters(m=m, n=config.n, norm_dim="column")).T
+    )
+    family.generate_code(CodeParameters(m=m, n=config.n, norm_dim="column"))
+    frame = family.get_code().T
     retained_count = int(np.floor(m / config.beta + 0.5))
     eigenvalues = []
     for _ in range(config.coded_trials):
@@ -168,7 +171,9 @@ def _collect_wishart_eigenvalues(
     code_parameters = CodeParameters(m=m, n=n)
     eigenvalues = []
     for _ in range(num_trials):
-        matrix = create_code_family(CodeType.WISHART, rng).generate_code(code_parameters).T
+        family = create_code_family(CodeType.WISHART, rng)
+        family.generate_code(code_parameters)
+        matrix = family.get_code().T
         eigenvalues.append(gram_matrix_eigenvalues(matrix))
     return np.concatenate(eigenvalues)
 
