@@ -7,7 +7,9 @@ import numpy as np
 from numpy.typing import NDArray
 
 from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
-from frame_codes.coding_scheme.state_utils.encoded_information import WeightedInformation
+from frame_codes.coding_scheme.state_utils.encoded_information import (
+    WeightedInformation,
+)
 from frame_codes.numerics.linear_algebra import normalize_code
 
 
