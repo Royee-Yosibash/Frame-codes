@@ -31,6 +31,8 @@ class OrthoMatDotCodeFamily(CodeFamily):
         if m > 1:
             matrix[:, 1] = nodes
         for degree in range(2, m):
-            matrix[:, degree] = 2 * nodes * matrix[:, degree - 1] - matrix[:, degree - 2]
+            matrix[:, degree] = (
+                2 * nodes * matrix[:, degree - 1] - matrix[:, degree - 2]
+            )
         matrix[:, 0] /= np.sqrt(2)
         return matrix

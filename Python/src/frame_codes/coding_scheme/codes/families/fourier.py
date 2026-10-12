@@ -1,4 +1,5 @@
 """Low-pass and band-pass Fourier code families."""
+
 from abc import ABC
 from functools import cache
 
@@ -24,9 +25,8 @@ class FourierCodeFamily(CodeFamily, ABC):
             A normalized inverse-DFT matrix.
         """
         indices = np.arange(n_nodes)
-        matrix = (
-            np.exp(2j * np.pi * np.outer(indices, indices) / n_nodes)
-            / np.sqrt(n_nodes)
+        matrix = np.exp(2j * np.pi * np.outer(indices, indices) / n_nodes) / np.sqrt(
+            n_nodes
         )
         return matrix
 

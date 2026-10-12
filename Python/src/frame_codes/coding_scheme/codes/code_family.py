@@ -15,8 +15,8 @@ from frame_codes.numerics.linear_algebra import normalize_code
 
 class CodeFamily(ABC):
     """Base class for node-by-message code generators."""
-    
-    _current_code = None 
+
+    _current_code = None
 
     @staticmethod
     def _validate_parameters(parameters: CodeParameters) -> None:
@@ -47,7 +47,7 @@ class CodeFamily(ABC):
 
     def number_of_encoded_sets(self):
         return self.get_code().shape[1]
-        
+
     def number_of_workers_required(self):
         return self.get_code().shape[0]
 

@@ -5,7 +5,9 @@ from numpy.typing import ArrayLike, NDArray
 from scipy.integrate import trapezoid
 
 
-def normalize_pdf(sample_points: ArrayLike, density_values: ArrayLike) -> NDArray[np.float64]:
+def normalize_pdf(
+    sample_points: ArrayLike, density_values: ArrayLike
+) -> NDArray[np.float64]:
     """Normalize sampled density values to have unit integral.
 
     Args:

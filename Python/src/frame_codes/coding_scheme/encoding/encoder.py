@@ -30,7 +30,9 @@ class Encoder:
         """
         worker_count = code_family.number_of_workers_required()
         return [
-            EncodedInformation(information_id=worker_id,
-                               information=code_family.encode_for_worker(worker_id, information_set))
+            EncodedInformation(
+                information_id=worker_id,
+                information=code_family.encode_for_worker(worker_id, information_set),
+            )
             for worker_id in range(worker_count)
         ]

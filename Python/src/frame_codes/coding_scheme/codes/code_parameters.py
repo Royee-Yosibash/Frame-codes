@@ -29,7 +29,7 @@ class CodeParameters:
             for value in dimensions
         ):
             raise TypeError("code dimensions must be integers")
-        
+
         if self.norm_dim not in {None, "row", "column"}:
             raise ValueError("norm_dim must be None, 'row', or 'column'")
 
