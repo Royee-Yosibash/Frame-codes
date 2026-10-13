@@ -3,7 +3,6 @@
 import unittest
 
 import numpy as np
-
 from frame_codes.numerics.linear_algebra import (
     gram_matrix_condition_number,
     gram_matrix_eigenvalues,

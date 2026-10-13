@@ -3,8 +3,6 @@
 import unittest
 
 import numpy as np
-from scipy.integrate import trapezoid
-
 from frame_codes.numerics.distributions import (
     histogram_bin_edges,
     histogram_pdf,
@@ -13,6 +11,7 @@ from frame_codes.numerics.distributions import (
     normalize_pdf,
     sample_from_pdf,
 )
+from scipy.integrate import trapezoid
 
 
 class TestNormalizePDF(unittest.TestCase):
