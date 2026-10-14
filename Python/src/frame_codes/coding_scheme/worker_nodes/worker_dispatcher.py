@@ -54,15 +54,14 @@ class WorkerDispatcher:
         self,
         encoded_information_sets: Sequence[Sequence[EncodedInformation]],
     ) -> list[WorkerResult]:
-        """Run workers and return results after applying response models.
+        """Run workers and omit any worker that returns a failed answer.
 
         Args:
             encoded_information_sets: Encoded information grouped by source
                 set, with each group containing worker assignments.
 
         Returns:
-            Results from workers selected to respond, with any configured
-            output alterations applied.
+            Results from workers whose operations returned answers.
         """
         raise NotImplementedError
 
