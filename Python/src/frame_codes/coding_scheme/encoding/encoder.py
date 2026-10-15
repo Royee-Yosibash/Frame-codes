@@ -3,7 +3,7 @@
 from collections.abc import Sequence
 
 from frame_codes.coding_scheme.codes.code_family import CodeFamily
-from frame_codes.coding_scheme.state_utils.encoded_information import EncodedInformation
+from frame_codes.coding_scheme.state_utils.information import EncodedInformation
 
 
 class Encoder:

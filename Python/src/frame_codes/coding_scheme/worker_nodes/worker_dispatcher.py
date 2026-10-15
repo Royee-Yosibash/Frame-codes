@@ -1,17 +1,18 @@
 """Dispatch encoded information to workers and model their responses."""
 
-from collections.abc import Callable, Mapping, Sequence
-from typing import Any
+from collections.abc import Mapping, Sequence
 
-from frame_codes.coding_scheme.state_utils.encoded_information import EncodedInformation
+from numpy.typing import DTypeLike
+
+from frame_codes.coding_scheme.state_utils.information import (
+    EncodedInformation,
+    Information,
+)
 from frame_codes.coding_scheme.worker_nodes.worker_node import (
     WorkerNode,
     WorkerOperation,
 )
 from frame_codes.coding_scheme.worker_runtime.runtime import WorkerResult
-
-ResponsePolicy = Callable[[Sequence[int]], Sequence[int]]
-OutputAlteration = Callable[[int, Any], Any]
 
 
 class WorkerDispatcher:
@@ -25,53 +26,85 @@ class WorkerDispatcher:
     def setup(
         self,
         number_of_workers_required: int,
-        parameters_per_worker: list[WorkerOperation] | WorkerOperation,
+        parameters_per_worker: Sequence[tuple[WorkerOperation, DTypeLike]],
     ) -> None:
         """Set up the requested number of workers from per-worker parameters.
 
         Args:
             number_of_workers_required: Number of worker nodes to configure.
-            parameters_per_worker: Worker operations, ordered by worker ID.
+            parameters_per_worker: Worker operation and calculation dtype for
+                each worker, ordered by worker ID.
 
         Raises:
             ValueError: If there is not one operation per requested worker.
         """
 
-        if not isinstance(parameters_per_worker, list):
-            parameters_per_worker = [
-                parameters_per_worker
-            ] * number_of_workers_required
-
         if len(parameters_per_worker) != number_of_workers_required:
-            raise ValueError("one worker operation per worker")
+            raise ValueError("one operation and calculation dtype are required per worker")
 
         self.workers = {
-            worker_id: WorkerNode(worker_id, operation)
-            for worker_id, operation in enumerate(parameters_per_worker)
+            worker_id: WorkerNode(worker_id, operation, calculation_type)
+            for worker_id, (operation, calculation_type) in enumerate(
+                parameters_per_worker
+            )
         }
 
     def dispatch(
         self,
-        encoded_information_sets: Sequence[Sequence[EncodedInformation]],
+        encoded_information: Sequence[EncodedInformation],
     ) -> list[WorkerResult]:
         """Run workers and omit any worker that returns a failed answer.
 
         Args:
-            encoded_information_sets: Encoded information grouped by source
-                set, with each group containing worker assignments.
+            encoded_information: One encoded-information record per worker.
 
         Returns:
             Results from workers whose operations returned answers.
         """
-        raise NotImplementedError
+        worker_information = self._consolidate_information(encoded_information)
+        return self._run_workers(worker_information)
 
+    @staticmethod
+    def _consolidate_information(
+        encoded_information: Sequence[EncodedInformation],
+    ) -> dict[int, list[list[Information]]]:
+        """Apply coefficients and group information by worker and code row.
+
+        Args:
+            encoded_information: One encoded-information record per worker.
+
+        Returns:
+            Coefficient-weighted information grouped by worker and code row.
+        """
+        return {
+            encoded.information_id: [
+                [item.information * item.coefficient for item in row]
+                for row in encoded.information
+            ]
+            for encoded in encoded_information
+        }
 
     def _run_workers(
         self,
+        worker_information: Mapping[int, Sequence[Sequence[Information]]],
     ) -> list[WorkerResult]:
-        """Execute the configured operation for every encoded worker row.
-        
+        """Execute all workers from their consolidated information inputs.
+
+        Args:
+            worker_information: Inputs grouped by worker ID and code row.
+
         Returns:
-            One result containing ordered row outputs per worker.
+            Results from workers that returned answers for all assigned rows.
         """
-        raise NotImplementedError
+        worker_results = []
+        for worker_id, information_rows in worker_information.items():
+            worker = self.workers[worker_id]
+            values = []
+            for information in information_rows:
+                value = worker.execute(information=information)
+                if value is None:
+                    break
+                values.append(value)
+            else:
+                worker_results.append(WorkerResult(worker_id, values))
+        return worker_results

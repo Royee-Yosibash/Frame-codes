@@ -6,9 +6,7 @@ from typing import Any, Protocol
 import numpy as np
 from numpy.typing import DTypeLike
 
-from frame_codes.coding_scheme.state_utils.encoded_information import (
-    WeightedInformation,
-)
+from frame_codes.coding_scheme.state_utils.information import Information
 
 
 class WorkerOperation(Protocol):
@@ -17,14 +15,15 @@ class WorkerOperation(Protocol):
     def __call__(
         self,
         *,
-        information: Sequence[WeightedInformation],
+        information: Sequence[Information],
         calculation_type: np.dtype,
         **kwargs: Any,
     ) -> Any:
         """Process an encoded information sequence.
 
         Args:
-            information: Weighted inputs for this worker operation.
+            information: Coefficient-weighted information items for one code
+                row.
             **kwargs: Operation-specific keyword arguments.
 
         Returns:
@@ -77,21 +76,31 @@ class WorkerNode:
     def execute(
         self,
         *,
-        information: Sequence[WeightedInformation],
+        information: Sequence[Information],
         **kwargs: Any,
     ) -> Any:
         """Execute this worker's operation on its encoded information.
 
         Args:
-            information: Weighted inputs for this worker operation.
+            information: Coefficient-weighted information items for one code
+                row.
             **kwargs: Additional arguments forwarded to the worker operation,
                 such as the deterministic straggler flag.
 
         Returns:
             The output produced by this worker's operation.
         """
+        calculation_type = self._calculation_type
+        calculation_information = []
+        for value in information:
+            numeric_information = np.asarray(value)
+            if np.issubdtype(numeric_information.dtype, np.number):
+                numeric_information = numeric_information.astype(
+                    calculation_type
+                )[()]
+            calculation_information.append(numeric_information)
         return self._operation(
-            information=information,
-            calculation_type=self._calculation_type,
+            information=calculation_information,
+            calculation_type=calculation_type,
             **kwargs,
         )

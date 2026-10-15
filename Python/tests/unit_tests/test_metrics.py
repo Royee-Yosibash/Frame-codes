@@ -3,7 +3,6 @@
 import unittest
 
 import numpy as np
-
 from frame_codes.numerics.metrics import error_measurement, frobenius_norm
 
 
