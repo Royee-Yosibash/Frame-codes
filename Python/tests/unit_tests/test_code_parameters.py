@@ -3,7 +3,6 @@
 import unittest
 
 import numpy as np
-
 from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 from frame_codes.coding_scheme.codes.factory import create_code_family
 from frame_codes.coding_scheme.worker_runtime.statistics import (

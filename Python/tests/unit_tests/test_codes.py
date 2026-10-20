@@ -3,7 +3,6 @@
 import unittest
 
 import numpy as np
-
 from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 from frame_codes.coding_scheme.codes.code_type import CodeType
 from frame_codes.coding_scheme.codes.factory import create_code_family
@@ -25,7 +24,7 @@ class TestCodeFamilyConstruction(unittest.TestCase):
 
         self.assertIsInstance(family, LowPassFourierCodeFamily)
 
-    def test_cached_deterministic_matrices_can_be_regenerated_after_mutation(self) -> None:
+    def test_cached_deterministic_matrices_regenerated_after_mutation(self) -> None:
         """Regeneration restores the cached code after current state mutation."""
         family = create_code_family("LPF")
         parameters = CodeParameters(m=3, n=8)
@@ -59,7 +58,9 @@ class TestCodeFamilyConstruction(unittest.TestCase):
 
     def test_vandermonde_code_uses_powers_as_columns(self) -> None:
         """The generator has one row per node and selected powers as columns."""
-        family = create_code_family("Non consecutive powers", rng=np.random.default_rng(2))
+        family = create_code_family(
+            "Non consecutive powers", rng=np.random.default_rng(2)
+        )
         family.generate_code(CodeParameters(m=4, n=9))
         code = family.get_code()
 
