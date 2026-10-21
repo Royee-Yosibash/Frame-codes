@@ -1,4 +1,4 @@
-"""Pseudoinverse decoding for regular one-row-per-worker codes."""
+"""Pseudoinverse decoding for code-family worker outputs."""
 
 from collections.abc import Sequence
 
@@ -12,18 +12,18 @@ from frame_codes.utils.numpy_types import as_inexact_array
 
 
 class PseudoInverseDecoder(AbstractDecoder):
-    """Decode regular code outputs with the pseudoinverse of surviving rows."""
+    """Decode code outputs with the pseudoinverse of surviving worker rows."""
 
     def decode(
         self,
         worker_results: Sequence[WorkerResult],
         code_family: CodeFamily,
     ) -> list[NDArray]:
-        """Decode one output per encoded set from surviving regular workers.
+        """Decode one output per encoded set from surviving workers.
 
         Args:
-            worker_results: One answer from each worker that returned a result.
-            code_family: Generated regular code with one row per worker.
+            worker_results: Answers from workers that returned results.
+            code_family: Generated family.
 
         Returns:
             Decoded worker-function outputs, one for each encoded set.
@@ -32,18 +32,20 @@ class PseudoInverseDecoder(AbstractDecoder):
             ValueError: If worker IDs or outputs do not match a regular code,
                 or the surviving code rows cannot recover every encoded set.
         """
-        code = as_inexact_array(code_family.get_code())
-        worker_ids = [result.worker_id for result in worker_results]
-        surviving_code = code[worker_ids]
+        worker_code_rows = []
+        worker_outputs = []
+        for result in worker_results:
+            worker_code_rows.extend(
+                code_family.get_code_rows_for_worker(result.worker_id)
+            )
+            worker_outputs.extend(
+                as_inexact_array(value) for value in result.values
+            )
+        surviving_code = as_inexact_array(np.asarray(worker_code_rows))
         if np.linalg.matrix_rank(surviving_code) < code_family.number_of_encoded_sets():
             raise ValueError("Surviving workers cannot recover every encoded set")
 
         decoder_matrix = np.linalg.pinv(surviving_code)
-
-        worker_outputs = [
-            as_inexact_array(result.values[0]) for result in worker_results
-        ]
-
         output_stack = np.stack(worker_outputs, axis=0)
         decoded_outputs = np.tensordot(decoder_matrix, output_stack, axes=(1, 0))
         return [np.asarray(output) for output in decoded_outputs]

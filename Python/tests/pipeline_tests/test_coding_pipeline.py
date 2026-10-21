@@ -2,6 +2,7 @@
 
 import unittest
 from collections.abc import Sequence
+from functools import partial
 
 import numpy as np
 from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
@@ -11,10 +12,28 @@ from frame_codes.coding_scheme.decoding.decoders.pseudo_inverse import (
 )
 from frame_codes.coding_scheme.encoding.encoder import Encoder
 from frame_codes.coding_scheme.state_utils.information import Information
+from frame_codes.coding_scheme.worker_nodes.operation_wrappers import (
+    with_deterministic_straggler,
+)
 from frame_codes.coding_scheme.worker_nodes.worker_dispatcher import (
     WorkerDispatcher,
 )
-from frame_codes.coding_scheme.worker_runtime.runtime import sample_worker_results
+
+
+def apply_worker_function(
+    information: Sequence[Information],
+    calculation_type: np.dtype,
+) -> np.ndarray:
+    """Sum coefficient-weighted information for one worker row.
+
+    Args:
+        information: Coefficient-weighted information values.
+        calculation_type: Dtype configured for the worker.
+
+    Returns:
+        The worker's encoded answer.
+    """
+    return sum(information)
 
 
 class TestWorkerCodingPipeline(unittest.TestCase):
@@ -32,22 +51,6 @@ class TestWorkerCodingPipeline(unittest.TestCase):
         self.dispatcher = WorkerDispatcher()
         self.decoder = PseudoInverseDecoder()
 
-    @staticmethod
-    def _apply_worker_function(
-        information: Sequence[Information],
-        calculation_type: np.dtype,
-    ) -> np.ndarray:
-        """Sum coefficient-weighted information for one worker row.
-
-        Args:
-            information: Coefficient-weighted information values.
-            calculation_type: Dtype configured for the worker.
-
-        Returns:
-            The worker's encoded answer.
-        """
-        return sum(information)
-
     def test_regular_code_recovers_information_after_worker_erasure(self) -> None:
         """The full pipeline recovers original items after one worker is lost."""
         code_family = create_code_family("LPF")
@@ -60,24 +63,25 @@ class TestWorkerCodingPipeline(unittest.TestCase):
 
         encoded_workers = self.encoder.encode(information_set, code_family)
         
+        worker_count = code_family.number_of_workers_required()
         self.dispatcher.setup(
-            code_family.number_of_workers_required(),
+            worker_count,
             [
-                (self._apply_worker_function, code_family.get_code().dtype)
-                for _ in range(code_family.number_of_workers_required())
+                (
+                    partial(
+                        with_deterministic_straggler(apply_worker_function),
+                        straggle=(worker_id == 0),
+                    ),
+                    code_family.get_code().dtype,
+                )
+                for worker_id in range(worker_count)
             ],
         )
         worker_results = self.dispatcher.dispatch(encoded_workers)
-        surviving_results = sample_worker_results(
-            worker_results,
-            straggler_count=1,
-            snr_db=300,
-            rng=np.random.default_rng(53),
-        )
-        decoded_information = self.decoder.decode(surviving_results, code_family)
+        decoded_information = self.decoder.decode(worker_results, code_family)
 
-        self.assertEqual(len(worker_results), 4)
-        self.assertEqual(len(surviving_results), 3)
+        self.assertEqual(len(worker_results), worker_count - 1)
+        self.assertNotIn(0, [result.worker_id for result in worker_results])
         self.assertEqual(len(decoded_information), len(information_set))
         for decoded, original in zip(decoded_information, information_set):
             np.testing.assert_allclose(decoded, original, atol=1e-12)
