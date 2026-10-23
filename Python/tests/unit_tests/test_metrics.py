@@ -3,7 +3,12 @@
 import unittest
 
 import numpy as np
-from frame_codes.numerics.metrics import error_measurement, frobenius_norm
+
+from frame_codes.numerics.metrics import (
+    error_measurement,
+    frobenius_norm,
+    relative_frobenius_error,
+)
 
 
 class TestFrobeniusNorm(unittest.TestCase):
@@ -26,6 +31,23 @@ class TestFrobeniusNorm(unittest.TestCase):
         matrix = np.array([[50_000]], dtype=np.int32)
 
         self.assertEqual(frobenius_norm(matrix), 50_000.0)
+
+
+
+class TestRelativeFrobeniusError(unittest.TestCase):
+    """Test comparison of calculated outputs to expected outputs."""
+
+    def test_uses_expected_norm_as_denominator(self) -> None:
+        """The relative error is normalized by the expected result's norm."""
+        expected = np.array([[3.0, 4.0]])
+        actual = np.array([[0.0, 0.0]])
+
+        self.assertEqual(relative_frobenius_error(actual, expected), 1.0)
+
+    def test_rejects_zero_reference(self) -> None:
+        """Relative error is undefined for a zero-norm expected result."""
+        with self.assertRaisesRegex(ValueError, "nonzero Frobenius norm"):
+            relative_frobenius_error(np.ones((1, 1)), np.zeros((1, 1)))
 
 
 class TestErrorMeasurement(unittest.TestCase):
