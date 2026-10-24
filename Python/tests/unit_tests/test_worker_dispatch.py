@@ -14,7 +14,10 @@ from frame_codes.coding_scheme.worker_nodes.operation_wrappers import (
     with_deterministic_straggler,
 )
 from frame_codes.coding_scheme.worker_nodes.worker_dispatcher import WorkerDispatcher
-from frame_codes.coding_scheme.worker_nodes.worker_node import WorkerOperation
+from frame_codes.coding_scheme.worker_nodes.worker_node import (
+    WorkerNodeConfig,
+    WorkerOperation,
+)
 
 
 class TestWorkerDispatch(unittest.TestCase):
@@ -57,12 +60,12 @@ class TestWorkerDispatch(unittest.TestCase):
         worker_count = code_family.number_of_workers_required()
         operation = with_deterministic_straggler(self._sum_information)
         worker_parameters = [
-            (
-                cast(
+            WorkerNodeConfig(
+                operation=cast(
                     WorkerOperation,
                     partial(operation, straggle=(worker_id == 0)),
                 ),
-                code_family.get_code().dtype,
+                calculation_type=code_family.get_code().dtype,
             )
             for worker_id in range(worker_count)
         ]
@@ -97,7 +100,10 @@ class TestWorkerDispatch(unittest.TestCase):
         dispatcher.setup(
             worker_count,
             [
-                (self._sum_information, code.dtype)
+                WorkerNodeConfig(
+                    operation=self._sum_information,
+                    calculation_type=code.dtype,
+                )
                 for _ in range(worker_count)
             ],
         )

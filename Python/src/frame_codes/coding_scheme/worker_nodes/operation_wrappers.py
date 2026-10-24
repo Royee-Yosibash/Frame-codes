@@ -1,17 +1,20 @@
 """Wrappers for modeling worker straggle outcomes."""
 
-from collections.abc import Callable
+from collections.abc import Sequence
 from functools import wraps
 from typing import Any
 
 import numpy as np
 
+from frame_codes.coding_scheme.state_utils.information import Information
+from frame_codes.coding_scheme.worker_nodes.worker_node import WorkerOperation
+
 
 def with_probabilistic_straggler(
-    operation: Callable[..., Any],
+    operation: WorkerOperation,
     straggler_probability: float,
     rng: np.random.Generator | None = None,
-) -> Callable[..., Any | None]:
+) -> WorkerOperation:
     """Wrap an operation with a probabilistic straggler outcome.
 
     Args:
@@ -35,11 +38,17 @@ def with_probabilistic_straggler(
     random_generator = np.random.default_rng() if rng is None else rng
 
     @wraps(operation)
-    def wrapped_operation(*args: Any, **kwargs: Any) -> Any | None:
+    def wrapped_operation(
+        *,
+        information: Sequence[Information],
+        calculation_type: np.dtype,
+        **kwargs: Any,
+    ) -> Any:
         """Return no answer on a straggler draw or run the operation.
 
         Args:
-            *args: Positional arguments forwarded to the operation.
+            information: Information supplied to the worker operation.
+            calculation_type: Dtype configured for the worker.
             **kwargs: Keyword arguments forwarded to the operation.
 
         Returns:
@@ -47,14 +56,18 @@ def with_probabilistic_straggler(
         """
         if random_generator.random() < straggler_probability:
             return None
-        return operation(*args, **kwargs)
+        return operation(
+            information=information,
+            calculation_type=calculation_type,
+            **kwargs,
+        )
 
     return wrapped_operation
 
 
 def with_deterministic_straggler(
-    operation: Callable[..., Any],
-) -> Callable[..., Any | None]:
+    operation: WorkerOperation,
+) -> WorkerOperation:
     """Wrap an operation with an explicit per-call straggler flag.
 
     Args:
@@ -67,14 +80,17 @@ def with_deterministic_straggler(
 
     @wraps(operation)
     def wrapped_operation(
-        *args: Any,
+        *,
+        information: Sequence[Information],
+        calculation_type: np.dtype,
         straggle: bool = False,
         **kwargs: Any,
-    ) -> Any | None:
+    ) -> Any:
         """Return no answer when explicitly marked as a straggler.
 
         Args:
-            *args: Positional arguments forwarded to the operation.
+            information: Information supplied to the worker operation.
+            calculation_type: Dtype configured for the worker.
             straggle: Whether this worker should return no answer.
             **kwargs: Keyword arguments forwarded to the operation.
 
@@ -88,6 +104,10 @@ def with_deterministic_straggler(
             raise TypeError("straggle must be a bool")
         if straggle:
             return None
-        return operation(*args, **kwargs)
+        return operation(
+            information=information,
+            calculation_type=calculation_type,
+            **kwargs,
+        )
 
     return wrapped_operation
