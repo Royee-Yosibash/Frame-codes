@@ -7,7 +7,7 @@ from numpy.typing import NDArray
 
 from frame_codes.coding_scheme.codes.code_family import CodeFamily
 from frame_codes.coding_scheme.decoding.abstract_decoder import AbstractDecoder
-from frame_codes.coding_scheme.worker_runtime.runtime import WorkerResult
+from frame_codes.coding_scheme.worker_nodes.worker_result import WorkerResult
 from frame_codes.utils.numpy_types import as_inexact_array
 
 

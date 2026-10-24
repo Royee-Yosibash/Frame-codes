@@ -5,7 +5,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from frame_codes.coding_scheme.codes.code_family import CodeFamily
-from frame_codes.coding_scheme.worker_runtime.runtime import WorkerResult
+from frame_codes.coding_scheme.worker_nodes.worker_result import WorkerResult
 
 
 class AbstractDecoder(ABC):
