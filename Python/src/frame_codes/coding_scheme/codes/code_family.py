@@ -67,6 +67,30 @@ class CodeFamily(ABC):
         """
         return self.get_code()[worker_id : worker_id + 1, set_index]
 
+    def get_code_rows_for_worker(self, worker_id: int) -> NDArray:
+        """Return this worker's code rows across all encoded sets.
+
+        Args:
+            worker_id: Worker identifier.
+
+        Returns:
+            The code rows assigned to the worker, shaped as rows by encoded
+            sets.
+
+        Raises:
+            AttributeError: If no code has been generated.
+            ValueError: If `worker_id` is outside the worker range.
+        """
+        worker_count = self.number_of_workers_required()
+        if worker_id < 0 or worker_id >= worker_count:
+            raise ValueError("worker_id is outside the generated code's worker range")
+        return np.column_stack(
+            [
+                self._get_coefficient_per_set(worker_id, set_index)
+                for set_index in range(self.number_of_encoded_sets())
+            ]
+        )
+
     def encode_for_worker(
         self,
         worker_id: int,
