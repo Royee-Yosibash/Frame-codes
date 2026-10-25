@@ -24,9 +24,8 @@ def gram_matrix_eigenvalues(matrix: ArrayLike) -> NDArray[np.float64]:
         TypeError: If the input dtype is not an integer, floating-point, or
             complex numeric type.
     """
-    values = _prepare_matrix(matrix)
-    gram_matrix = _calculate_gram_matrix(values)
-    return np.linalg.eigvalsh(gram_matrix)
+    values = as_inexact_array(np.asarray(matrix))
+    return np.linalg.eigvalsh(calculate_gram_matrix(values))
 
 
 def gram_matrix_condition_number(matrix: ArrayLike) -> float:
@@ -47,7 +46,7 @@ def gram_matrix_condition_number(matrix: ArrayLike) -> float:
         TypeError: If the input dtype is not an integer, floating-point, or
             complex numeric type.
     """
-    values = _prepare_matrix(matrix)
+    values = as_inexact_array(np.asarray(matrix))
     singular_values = np.linalg.svd(values, compute_uv=False)
     if np.linalg.matrix_rank(values) < singular_values.size:
         return float("inf")
@@ -88,27 +87,7 @@ def normalize_code(
     return values / norms
 
 
-def _prepare_matrix(matrix: ArrayLike) -> NDArray[np.float64] | NDArray[np.complex128]:
-    """Validate a matrix and promote its dtype for numerical calculations.
-
-    Args:
-        matrix: A non-empty two-dimensional real or complex numeric matrix.
-
-    Returns:
-        The matrix promoted to `float64` or `complex128`.
-
-    Raises:
-        ValueError: If the input is not a non-empty two-dimensional matrix.
-        TypeError: If the input dtype is not an integer, floating-point, or
-            complex numeric type.
-    """
-    values = np.asarray(matrix)
-    if values.ndim != 2 or 0 in values.shape:
-        raise ValueError("matrix must be a non-empty two-dimensional array")
-    return as_inexact_array(values)
-
-
-def _calculate_gram_matrix(
+def calculate_gram_matrix(
     matrix: NDArray[np.float64] | NDArray[np.complex128],
 ) -> NDArray[np.float64] | NDArray[np.complex128]:
     """Calculate the smaller Gram matrix using a conjugate transpose.

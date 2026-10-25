@@ -112,7 +112,8 @@ class CodeFamily(ABC):
                 incompatible with the generated code.
         """
         worker_count = self.number_of_workers_required()
-        worker_id = int(worker_id)
+        if isinstance(worker_id, bool) or (not isinstance(worker_id, int)):
+            raise TypeError("worker_id must be an integer")
         if worker_id < 0 or worker_id >= worker_count:
             raise ValueError("worker_id is outside the generated code's worker range")
         if len(information_set) != self.number_of_encoded_sets():

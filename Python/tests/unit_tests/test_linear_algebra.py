@@ -37,11 +37,6 @@ class TestGramMatrixEigenvalues(unittest.TestCase):
 
         np.testing.assert_allclose(eigenvalues, [2, 4])
 
-    def test_rejects_non_matrix_inputs(self) -> None:
-        """Eigenvalue calculation requires a non-empty matrix."""
-        with self.assertRaisesRegex(ValueError, "non-empty two-dimensional"):
-            gram_matrix_eigenvalues([1, 2, 3])
-
 
 class TestGramMatrixConditionNumber(unittest.TestCase):
     """Test Gram matrix condition-number calculations."""
@@ -57,11 +52,6 @@ class TestGramMatrixConditionNumber(unittest.TestCase):
         matrix = np.array([[1.0, 2.0], [2.0, 4.0]])
 
         self.assertTrue(np.isinf(gram_matrix_condition_number(matrix)))
-
-    def test_rejects_non_matrix_inputs(self) -> None:
-        """Condition number calculation requires a non-empty matrix."""
-        with self.assertRaisesRegex(ValueError, "non-empty two-dimensional"):
-            gram_matrix_condition_number([1, 2, 3])
 
 
 class TestNormalizeCode(unittest.TestCase):

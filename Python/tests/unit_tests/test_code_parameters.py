@@ -5,7 +5,7 @@ import unittest
 import numpy as np
 from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 from frame_codes.coding_scheme.codes.factory import create_code_family
-from frame_codes.coding_scheme.worker_runtime.statistics import (
+from frame_codes.comparison.statistics import (
     CodePerformanceStatistics,
     create_dual_frame_matrix,
     sample_code_statistics,
