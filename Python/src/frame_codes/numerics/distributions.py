@@ -77,6 +77,9 @@ def manova_pdf(
         raise ValueError("MANOVA parameters must satisfy 0 < gamma <= beta <= 1")
     points = np.asarray(sample_points, dtype=np.float64)
     density = np.zeros(points.shape, dtype=np.float64)
+    if beta == 1 and gamma == 1:
+        density.flat[np.abs(points - 1).argmin()] = 1.0
+        return density
 
     left = np.sqrt((1 - gamma) / beta)
     right = np.sqrt(1 - gamma / beta)

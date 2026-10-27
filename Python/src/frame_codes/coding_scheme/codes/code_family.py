@@ -82,6 +82,8 @@ class CodeFamily(ABC):
             ValueError: If `worker_id` is outside the worker range.
         """
         worker_count = self.number_of_workers_required()
+        if isinstance(worker_id, bool) or not isinstance(worker_id, int):
+            raise TypeError("worker_id must be an integer")
         if worker_id < 0 or worker_id >= worker_count:
             raise ValueError("worker_id is outside the generated code's worker range")
         return np.column_stack(
