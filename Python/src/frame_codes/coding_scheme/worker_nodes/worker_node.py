@@ -103,12 +103,24 @@ class WorkerNode:
 
         Returns:
             The output produced by this worker's operation.
+
+        Raises:
+            TypeError: If numeric information cannot be cast to the configured
+                calculation dtype using NumPy's same-kind casting rule.
         """
         calculation_type = self.calculation_type
         calculation_information = []
         for value in information:
             numeric_information = np.asarray(value)
             if np.issubdtype(numeric_information.dtype, np.number):
+                if not np.can_cast(
+                    numeric_information.dtype,
+                    calculation_type,
+                    casting="same_kind",
+                ):
+                    raise TypeError(
+                        "information dtype cannot be cast to worker using same-kind casting"
+                    )
                 numeric_information = numeric_information.astype(
                     calculation_type
                 )[()]

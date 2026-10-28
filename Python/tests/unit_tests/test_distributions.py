@@ -57,6 +57,16 @@ class TestTheoreticalDistributions(unittest.TestCase):
         continuous_density[atom_index] = 0.0
         self.assertAlmostEqual(trapezoid(continuous_density, points), 0.75, places=4)
 
+    def test_manova_degenerate_endpoint_is_a_unit_atom(self) -> None:
+        """The beta=gamma=1 endpoint places all density mass at one."""
+        points = np.linspace(0, 1, 101)
+
+        density = manova_pdf(points, beta=1.0, gamma=1.0)
+
+        self.assertTrue(np.all(np.isfinite(density)))
+        self.assertEqual(np.count_nonzero(density), 1)
+        self.assertEqual(density[100], 1.0)
+
     def test_marchenko_pastur_density_has_unit_mass_and_expected_support(self) -> None:
         """The beta-below-one MP density integrates to one on its support."""
         beta = 0.25
