@@ -36,6 +36,12 @@ class ArticleFigureConfig:
             raise ValueError("n must be positive")
         if not 0 < self.gamma <= self.beta <= 1:
             raise ValueError("aspect ratios must satisfy 0 < gamma <= beta <= 1")
+        trial_counts = (self.coded_trials, self.wishart_trials, self.pdf_points)
+        if any(
+            isinstance(value, bool) or not isinstance(value, (int, np.integer))
+            for value in trial_counts
+        ):
+            raise TypeError("trial counts and pdf_points must be integers")
         if self.coded_trials <= 0 or self.wishart_trials <= 0:
             raise ValueError("trial counts must be positive")
         if self.pdf_points < 2:
