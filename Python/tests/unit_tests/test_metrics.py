@@ -3,7 +3,7 @@
 import unittest
 
 import numpy as np
-from frame_codes.numerics.metrics import (
+from frame_codes.comparison.metrics import (
     error_measurement,
     frobenius_norm,
     relative_frobenius_error,
