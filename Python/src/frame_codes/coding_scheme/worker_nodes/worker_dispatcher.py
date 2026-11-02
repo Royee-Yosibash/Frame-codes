@@ -1,4 +1,13 @@
-"""Dispatch encoded information to workers and model their responses."""
+"""Dispatch encoded records to configured workers and collect responses.
+
+`setup()` assigns configurations to worker IDs by sequence order and requires
+one configuration per worker. `dispatch()` applies coefficients, groups encoded
+information by worker ID, executes each worker's operations and returns results
+only from workers that answered.
+
+Worker calls receive the information only; the dispatcher does not forward
+additional operation arguments.
+"""
 
 from collections.abc import Mapping, Sequence
 
@@ -47,37 +56,37 @@ class WorkerDispatcher:
 
     def dispatch(
         self,
-        encoded_information: Sequence[EncodedInformation],
+        encoded_information_per_worker: Sequence[EncodedInformation],
     ) -> list[WorkerResult]:
         """Run workers and omit any worker that returns a failed answer.
 
         Args:
-            encoded_information: One encoded-information record per worker.
+            encoded_information_per_worker: One encoded-information record per worker.
 
         Returns:
             Results from workers whose operations returned answers.
         """
-        worker_information = self._consolidate_information(encoded_information)
+        worker_information = self._consolidate_information(encoded_information_per_worker)
         return self._run_workers(worker_information)
 
     @staticmethod
     def _consolidate_information(
-        encoded_information: Sequence[EncodedInformation],
+        encoded_information_per_worker: Sequence[EncodedInformation],
     ) -> dict[int, list[list[Information]]]:
-        """Apply coefficients and group information by worker and code row.
+        """Apply coefficients and group information by worker and coding.
 
         Args:
-            encoded_information: One encoded-information record per worker.
+            encoded_information_per_worker: One encoded-information record per worker.
 
         Returns:
-            Coefficient-weighted information grouped by worker and code row.
+            Coefficient-weighted information grouped by worker.
         """
         return {
-            encoded.information_id: [
-                [item.information * item.coefficient for item in row]
-                for row in encoded.information
+            encoded_information.information_id: [
+                [item.information * item.coefficient for item in weighted_information]
+                for weighted_information in encoded_information.weighted_information
             ]
-            for encoded in encoded_information
+            for encoded_information in encoded_information_per_worker
         }
 
     def _run_workers(
@@ -87,16 +96,16 @@ class WorkerDispatcher:
         """Execute all workers from their consolidated information inputs.
 
         Args:
-            worker_information: Inputs grouped by worker ID and code row.
+            worker_information: Inputs grouped by worker ID and encoded information.
 
         Returns:
-            Results from workers that returned answers for all assigned rows.
+            Results from workers that returned answers for all encoded information.
         """
         worker_results = []
-        for worker_id, information_rows in worker_information.items():
+        for worker_id, information_sequence in worker_information.items():
             worker = self.workers[worker_id]
             values = []
-            for information in information_rows:
+            for information in information_sequence:
                 value = worker.execute(information=information)
                 if value is None:
                     break

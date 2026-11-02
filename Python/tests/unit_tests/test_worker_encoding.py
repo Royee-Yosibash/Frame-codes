@@ -75,7 +75,7 @@ class TestWorkerEncoding(unittest.TestCase):
         self.assertEqual(
             [worker.information_id for worker in encoded_workers], [0, 1, 2]
         )
-        self.assertTrue(all(len(worker.information) == 2 for worker in encoded_workers))
+        self.assertTrue(all(len(worker.weighted_information) == 2 for worker in encoded_workers))
 
     def test_rejects_invalid_worker_and_information_count(self) -> None:
         """The family rejects worker IDs and item counts outside its code."""

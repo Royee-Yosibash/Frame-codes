@@ -51,4 +51,4 @@ class EncodedInformation:
     """Encoded inputs for one logical worker."""
 
     information_id: int
-    information: list[list[WeightedInformation]]
+    weighted_information: list[list[WeightedInformation]]

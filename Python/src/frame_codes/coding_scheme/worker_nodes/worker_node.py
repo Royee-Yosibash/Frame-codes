@@ -11,7 +11,7 @@ from frame_codes.coding_scheme.state_utils.information import Information
 
 
 class WorkerOperation(Protocol):
-    """Callable worker logic receiving encoded information by name."""
+    """Callable interface expected of a worker operation."""
 
     def __call__(
         self,
@@ -20,7 +20,7 @@ class WorkerOperation(Protocol):
         calculation_type: np.dtype,
         **kwargs: Any,
     ) -> Any:
-        """Process an encoded information sequence.
+        """Process a worker's encoded information.
 
         Args:
             information: Coefficient-weighted information items for one code
@@ -29,6 +29,7 @@ class WorkerOperation(Protocol):
 
         Returns:
             The operation's result.
+
         """
 
 
