@@ -1,4 +1,28 @@
-"""Simple band-circulant code family with discrete worker counts."""
+"""Generate a deterministic code from cyclic band blocks.
+
+The generator matrix has shape (n, m) - each row gives the coefficients
+assigned to that per item in the encoded set.
+
+The code is constructed by a series of 'bands' each containing a unique block matrix.
+Every band 'b' contains all m cyclic shifts of a binary row containing b consecutive '1's
+and the rest of the row is '0's.
+For example, Band 0 shifts a single '1' giving the identity matrix.
+Band 1 shifts two adjacent ones, band 2 shifts three, and so on.
+The last band, or the terminal band, is the only band with one row of all '1's.
+
+For example, m = 4 and n = 9 produce two complete blocks and a final row::
+
+    [[1, 0, 0, 0],
+     [0, 1, 0, 0],
+     [0, 0, 1, 0],
+     [0, 0, 0, 1],
+     [1, 1, 0, 0],
+     [0, 1, 1, 0],
+     [0, 0, 1, 1],
+     [1, 0, 0, 1],
+     [1, 1, 1, 1]]
+
+"""
 
 import numpy as np
 from numpy.typing import NDArray
@@ -8,7 +32,7 @@ from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 
 
 class SimpleBandCirculantCode(CodeFamily):
-    """Build identity and cyclic band rows from the requested worker count."""
+    """Build cyclic band rows from the requested worker count."""
 
     @staticmethod
     def _validate_parameters(parameters: CodeParameters) -> None:
@@ -40,31 +64,31 @@ class SimpleBandCirculantCode(CodeFamily):
     def _generate_new_code(
         self,
         parameters: CodeParameters,
-    ) -> NDArray[np.float64]:
-        """Construct the configured identity and cyclic band rows.
+    ) -> NDArray[np.bool_]:
+        """Construct the configured cyclic band rows starting at band level 0.
 
         Args:
             parameters: Number of encoded sets and requested workers.
 
         Returns:
-            A real generator matrix shaped as workers by encoded sets.
+            A boolean generator matrix shaped as workers by encoded sets.
         """
         m = parameters.m
         has_terminal_band = parameters.n % m == 1
         regular_band_count = (
             (parameters.n - 1) // m if has_terminal_band else parameters.n // m
         )
-        rows = [row.copy() for row in np.eye(m, dtype=np.float64)]
+        rows = []
 
-        for band_index in range(1, regular_band_count):
+        for band_index in range(regular_band_count):
             pattern = np.concatenate(
                 (
-                    np.ones(band_index + 1, dtype=np.float64),
-                    np.zeros(m - band_index - 1, dtype=np.float64),
+                    np.ones(band_index + 1, dtype=bool),
+                    np.zeros(m - band_index - 1, dtype=bool),
                 )
             )
             rows.extend(np.roll(pattern, shift) for shift in range(m))
 
         if has_terminal_band:
-            rows.append(np.ones(m, dtype=np.float64))
-        return np.asarray(rows, dtype=np.float64)
+            rows.append(np.ones(m, dtype=bool))
+        return np.asarray(rows, dtype=bool)
