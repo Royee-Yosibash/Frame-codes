@@ -1,7 +1,7 @@
 """Generate a deterministic code from cyclic band blocks.
 
-The generator matrix has shape (n, m) - each row gives the coefficients
-assigned to that per item in the encoded set.
+The generator matrix has shape (n, m) - each row gives the encoding coefficients
+assigned per 'm' items of the encoded set.
 
 The code is constructed by a series of 'bands' each containing a unique block matrix.
 Every band 'b' contains all m cyclic shifts of a binary row containing b consecutive '1's
@@ -21,6 +21,13 @@ For example, m = 4 and n = 9 produce two complete blocks and a final row::
      [0, 0, 1, 1],
      [1, 0, 0, 1],
      [1, 1, 1, 1]]
+
+Notable properties:
+1. Every item in the encoded set appears equally often in the rows.
+2. Every band adds one more '1' per row -> each encoding element participates (b_i + 1)
+times in construction of the band rows (not including the terminal band).
+3. From the above follows that for 'b_m' the highest complete band level each column
+contains (b_m + 1)(b_m + 2) / 2 '1's, and another if the terminal band is present.
 
 """
 
