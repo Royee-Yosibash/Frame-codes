@@ -1,0 +1,41 @@
+defaults:
+  - experiment_init
+  - _self_
+
+init:
+  lhs:
+    - [1.0, 2.0, 0.0]
+    - [0.0, -1.0, 3.0]
+    - [4.0, 1.0, 2.0]
+  rhs:
+    - [1.0, 0.0]
+    - [0.0, 1.0]
+    - [1.0, 1.0]
+
+pipeline:
+  - call: code_family.generate_code
+    args: ["@code_parameters"]
+
+  - call: numpy.asarray
+    args: ["@lhs"]
+    assign: lhs_array
+
+  - call: numpy.split
+    args: ["@lhs_array", "@code_parameters.m"]
+    kwargs:
+      axis: 0
+    assign: information_set
+
+  - call: encoder.encode
+    args: ["@information_set", "@code_family"]
+    assign: encoded_information
+
+  - call: functools.partial
+    args: ["@worker_operation"]
+    kwargs:
+      rhs: "@rhs"
+    assign: worker_operation
+
+sweep:
+  stragglers_per_trial: 2
+  worker_calculation_type: float64
