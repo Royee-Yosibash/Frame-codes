@@ -1,4 +1,4 @@
-"""Code families names."""
+"""Recognized Code families names."""
 
 from enum import StrEnum
 
@@ -13,5 +13,6 @@ class CodeType(StrEnum):
     NON_CONSECUTIVE_POWERS = "Non consecutive powers"
     ORTHO_MAT_DOT = "OrthoMatDot"
     CIRCULANT_PERMUTATION = "Circulant Permutation"
+    SIMPLE_BAND_CIRCULANT = "SimpleBandCirculantCode"
     BCH = "BCH"
     REED_SOLOMON = "Reed Solomon"
