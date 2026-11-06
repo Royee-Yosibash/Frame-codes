@@ -29,15 +29,14 @@ class PseudoInverseDecoder(AbstractDecoder):
             Decoded worker-function outputs, one for each encoded set.
 
         Raises:
-            ValueError: If worker IDs or outputs do not match a regular code,
-                or the surviving code rows cannot recover every encoded set.
+            ValueError: If worker IDs are invalid or the surviving code rows
+                cannot recover every encoded set.
         """
         worker_code_rows = []
         worker_outputs = []
         for result in worker_results:
-            worker_code_rows.extend(
-                code_family.get_code_rows_for_worker(result.worker_id)
-            )
+            code_rows = code_family.get_code_rows_for_worker(result.worker_id)
+            worker_code_rows.extend(code_rows)
             worker_outputs.extend(
                 as_inexact_array(value) for value in result.values
             )

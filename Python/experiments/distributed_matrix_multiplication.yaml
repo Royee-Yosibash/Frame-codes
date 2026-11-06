@@ -38,4 +38,5 @@ pipeline:
 
 sweep:
   stragglers_per_trial: 2
-  worker_calculation_type: float64
+  worker_calculation_types:
+    - float64

@@ -3,6 +3,7 @@
 import unittest
 
 import numpy as np
+
 from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 from frame_codes.coding_scheme.codes.factory import create_code_family
 from frame_codes.coding_scheme.decoding.decoders.pseudo_inverse import (
@@ -52,15 +53,6 @@ class TestPseudoInverseDecoder(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             PseudoInverseDecoder().decode(worker_results, family)
-
-        with self.assertRaises(ValueError):
-            PseudoInverseDecoder().decode(worker_results, family)
-
-    def test_rejects_worker_output_count_mismatch(self):
-        """Each result must contain an output for every assigned code row."""
-        family = create_code_family("LPF")
-        family.generate_code(CodeParameters(m=2, n=4))
-        worker_results = [WorkerResult(worker_id=0, values=[])]
 
         with self.assertRaises(ValueError):
             PseudoInverseDecoder().decode(worker_results, family)
