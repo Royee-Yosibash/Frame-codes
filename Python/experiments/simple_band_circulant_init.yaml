@@ -19,7 +19,6 @@ init:
   decoder:
     _target_: frame_codes.coding_scheme.decoding.decoders.pseudo_inverse.PseudoInverseDecoder
 
-
   worker_operation:
     _target_: frame_codes.distributed_matrix_multiplication.operations.matrix_product
     _partial_: true

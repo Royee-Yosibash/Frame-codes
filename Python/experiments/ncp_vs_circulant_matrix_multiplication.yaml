@@ -1,0 +1,38 @@
+defaults:
+  - pipeline_setup
+  - _self_
+
+init:
+  _target_: builtins.dict
+
+  code_parameters:
+    _target_: frame_codes.coding_scheme.codes.code_parameters.CodeParameters
+    m: 80
+    n: 100
+
+  matrix_rng:
+    _target_: numpy.random.default_rng
+    seed: 2026
+
+  matrix_dimension: 160
+
+  worker_operation:
+    _target_: frame_codes.distributed_matrix_multiplication.operations.matrix_product
+    _partial_: true
+
+code_experiments:
+  - name: Non consecutive powers
+    code_type: Non consecutive powers
+    calculation_type: complex128
+    rng:
+      _target_: numpy.random.default_rng
+      seed: 29
+
+  - name: Circulant Permutation
+    code_type: Circulant Permutation
+    calculation_type: float64
+
+sweep:
+  stragglers_per_trial: 10
+  num_trials: 100
+  straggler_seed: 2026

@@ -1,5 +1,5 @@
 defaults:
-  - experiment_init
+  - simple_band_circulant_init
   - _self_
 
 init:
