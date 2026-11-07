@@ -1,0 +1,24 @@
+init:
+  _target_: builtins.dict
+
+  code_family:
+    _target_: frame_codes.code_families.factory.create_code_family
+    code_type: SimpleBandCirculantCode
+
+  code_parameters:
+    _target_: frame_codes.coding_scheme.codes.code_parameters.CodeParameters
+    m: 3
+    n: 6
+
+  encoder:
+    _target_: frame_codes.coding_scheme.encoding.encoder.Encoder
+
+  dispatcher:
+    _target_: frame_codes.coding_scheme.worker_nodes.worker_dispatcher.WorkerDispatcher
+
+  decoder:
+    _target_: frame_codes.coding_scheme.decoding.decoders.pseudo_inverse.PseudoInverseDecoder
+
+  worker_operation:
+    _target_: frame_codes.distributed_matrix_multiplication.operations.matrix_product
+    _partial_: true

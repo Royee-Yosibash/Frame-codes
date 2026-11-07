@@ -1,0 +1,9 @@
+init:
+  encoder:
+    _target_: frame_codes.coding_scheme.encoding.encoder.Encoder
+
+  dispatcher:
+    _target_: frame_codes.coding_scheme.worker_nodes.worker_dispatcher.WorkerDispatcher
+
+  decoder:
+    _target_: frame_codes.coding_scheme.decoding.decoders.pseudo_inverse.PseudoInverseDecoder
