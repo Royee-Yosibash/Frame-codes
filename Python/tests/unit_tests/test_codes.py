@@ -3,12 +3,13 @@
 import unittest
 
 import numpy as np
-from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
-from frame_codes.coding_scheme.codes.code_type import CodeType
-from frame_codes.coding_scheme.codes.factory import create_code_family
-from frame_codes.coding_scheme.codes.families.fourier import (
+
+from frame_codes.code_families.code_type import CodeType
+from frame_codes.code_families.factory import create_code_family
+from frame_codes.code_families.fourier import (
     LowPassFourierCodeFamily,
 )
+from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 
 
 class TestCodeFamilyConstruction(unittest.TestCase):

@@ -1,4 +1,4 @@
-"""Block rotation code families for circulant permutation coding."""
+"""Block rotation code family implementation for circulant permutation coding."""
 
 from functools import cache
 

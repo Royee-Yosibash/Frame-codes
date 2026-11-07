@@ -1,4 +1,4 @@
-"""Chebyshev polynomial code families used by OrthoMatDot."""
+"""Chebyshev polynomial code family implementation for OrthoMatDot."""
 
 from functools import cache
 

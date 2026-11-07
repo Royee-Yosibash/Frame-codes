@@ -1,4 +1,4 @@
-"""Wishart-style Gaussian code families."""
+"""Wishart-style Gaussian code family implementation."""
 
 import numpy as np
 from numpy.typing import NDArray

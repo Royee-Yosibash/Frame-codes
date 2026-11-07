@@ -1,4 +1,4 @@
-"""Generate a deterministic code from cyclic band blocks.
+"""Simple band-circulant code family implementation.
 
 The generator matrix has shape (n, m) - each row gives the encoding coefficients
 assigned per 'm' items of the encoded set.

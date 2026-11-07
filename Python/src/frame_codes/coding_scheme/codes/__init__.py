@@ -1,1 +1,1 @@
-"""Code types, parameters, families, and constructors."""
+"""Shared code-family interfaces and parameter definitions."""

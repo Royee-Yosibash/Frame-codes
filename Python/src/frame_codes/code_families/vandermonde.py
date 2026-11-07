@@ -1,4 +1,4 @@
-"""Random row-selected root-of-unity Vandermonde code families."""
+"""Random row-selected root-of-unity Vandermonde code family."""
 
 from functools import cache
 

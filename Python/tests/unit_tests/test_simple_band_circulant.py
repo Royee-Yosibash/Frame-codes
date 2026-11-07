@@ -5,11 +5,11 @@ from itertools import combinations
 
 import numpy as np
 
-from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
-from frame_codes.coding_scheme.codes.factory import create_code_family
-from frame_codes.coding_scheme.codes.families.simple_band_circulant import (
+from frame_codes.code_families.factory import create_code_family
+from frame_codes.code_families.simple_band_circulant import (
     SimpleBandCirculantCode,
 )
+from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 
 
 class TestSimpleBandCirculantCode(unittest.TestCase):

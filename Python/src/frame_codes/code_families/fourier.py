@@ -1,4 +1,4 @@
-"""Low-pass and band-pass Fourier code families."""
+"""Low-pass and band-pass Fourier code family implementations."""
 
 from abc import ABC
 from functools import cache

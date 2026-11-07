@@ -6,10 +6,10 @@ from pathlib import Path
 from hydra import compose, initialize_config_dir
 from hydra.utils import instantiate
 
-from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
-from frame_codes.coding_scheme.codes.families.simple_band_circulant import (
+from frame_codes.code_families.simple_band_circulant import (
     SimpleBandCirculantCode,
 )
+from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 from frame_codes.coding_scheme.decoding.decoders.pseudo_inverse import (
     PseudoInverseDecoder,
 )
@@ -24,7 +24,7 @@ class TestHydraExperimentInit(unittest.TestCase):
         """Hydra builds the code, encoder, dispatcher, and decoder objects."""
         config_directory = Path(__file__).resolve().parents[2] / "experiments"
         with initialize_config_dir(version_base=None, config_dir=str(config_directory)):
-            config = compose(config_name="experiment_init")
+            config = compose(config_name="simple_band_circulant_init")
 
         workspace = instantiate(config.init)
 

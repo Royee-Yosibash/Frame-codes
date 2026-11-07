@@ -5,16 +5,17 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy.typing import NDArray
+
+from frame_codes.code_families.code_type import CodeType
+from frame_codes.code_families.factory import create_code_family
 from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
-from frame_codes.coding_scheme.codes.code_type import CodeType
-from frame_codes.coding_scheme.codes.factory import create_code_family
 from frame_codes.numerics.distributions import (
     histogram_pdf,
     manova_pdf,
     marchenko_pastur_pdf,
 )
 from frame_codes.numerics.linear_algebra import gram_matrix_eigenvalues
-from numpy.typing import NDArray
 
 
 @dataclass(frozen=True)
