@@ -1,0 +1,24 @@
+single_trial_pipeline:
+  - call: dispatcher.reset
+
+  - encoded_information:
+      call: encoder.encode
+      kwargs:
+        information_set: "@information_set"
+        code_family: "@code_family"
+
+  - call: dispatcher.setup
+    kwargs:
+      number_of_workers_required: "@worker_count"
+      parameters_per_worker: "@worker_configurations"
+
+  - worker_results:
+      call: dispatcher.dispatch
+      kwargs:
+        encoded_information_per_worker: "@encoded_information"
+
+  - decoded_blocks:
+      call: decoder.decode
+      kwargs:
+        worker_results: "@worker_results"
+        code_family: "@code_family"

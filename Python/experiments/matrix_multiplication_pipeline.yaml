@@ -1,0 +1,42 @@
+defaults:
+  - single_trial_pipeline
+  - _self_
+
+code_input_pipeline:
+  - call: code_family.generate_code
+    kwargs:
+      parameters: "@code_parameters"
+
+  - lhs_array:
+      call: numpy.asarray
+      kwargs:
+        a: "@lhs"
+
+  - encoded_set_count:
+      call: code_family.number_of_encoded_sets
+
+  - information_set:
+      call: numpy.split
+      kwargs:
+        ary: "@lhs_array"
+        indices_or_sections: "@encoded_set_count"
+        axis: 0
+
+matrix_multiplication_setup_pipeline:
+  - worker_operation:
+      call: functools.partial
+      args: ["@worker_operation"]
+      kwargs:
+        rhs: "@rhs"
+
+  - worker_operation:
+      call: frame_codes.coding_scheme.worker_nodes.operation_wrappers.with_deterministic_straggler
+      kwargs:
+        operation: "@worker_operation"
+
+post_trial_pipeline:
+  - result:
+      call: numpy.concatenate
+      args: ["@decoded_blocks"]
+      kwargs:
+        axis: 0

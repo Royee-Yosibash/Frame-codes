@@ -1,7 +1,14 @@
 defaults:
   - pipeline_setup
-  - worker_trial_pipeline
+  - matrix_multiplication_worker_init
+  - matrix_multiplication_pipeline
   - _self_
+
+results:
+  trial:
+    _target_: frame_codes.comparison.results.TrialMetrics
+  experiment:
+    _target_: frame_codes.comparison.results.ExperimentResult
 
 init:
   _target_: builtins.dict
@@ -17,9 +24,83 @@ init:
 
   matrix_dimension: 160
 
-  worker_operation:
-    _target_: frame_codes.distributed_matrix_multiplication.operations.matrix_product
-    _partial_: true
+pipeline:
+  - lhs:
+      call: matrix_rng.standard_normal
+      kwargs:
+        size: ["@matrix_dimension", "@matrix_dimension"]
+
+  - rhs:
+      call: numpy.linalg.inv
+      kwargs:
+        a: "@lhs"
+
+  - reference_result:
+      call: numpy.matmul
+      args: ["@lhs", "@rhs"]
+
+  - comparison_results:
+      call: builtins.list
+
+  - run: "@config.matrix_multiplication_setup_pipeline"
+
+  - for_each:
+      values: "@config.code_experiments"
+      as: experiment
+      steps:
+        - experiment_rng:
+            call: hydra.utils.instantiate
+            args: ["@experiment.rng"]
+
+        - code_family:
+            call: frame_codes.code_families.factory.create_code_family
+            kwargs:
+              code_type: "@experiment.code_type"
+              rng: "@experiment_rng"
+
+        - run: "@config.code_input_pipeline"
+
+        - worker_calculation_type:
+            call: builtins.str
+            args: ["@experiment.calculation_type"]
+
+        - calculation_dtype:
+            call: numpy.dtype
+            kwargs:
+              dtype: "@experiment.calculation_type"
+
+        - trial_metrics:
+            call: builtins.list
+
+        - experiment_trials:
+            call: frame_codes.distributed_matrix_multiplication.erasure_sweep.run_erasure_sweep
+            kwargs:
+              workspace: "@workspace"
+
+        - for_each:
+            values: "@experiment_trials"
+            as: trial
+            steps:
+              - call: trial_metrics.append
+                args: ["@trial.trial_result"]
+
+        - experiment_result_type:
+            call: hydra.utils.get_method
+            kwargs:
+              path: "@config.results.experiment._target_"
+
+        - experiment_result:
+            call: experiment_result_type
+            kwargs:
+              name: "@experiment.name"
+              code_type: "@experiment.code_type"
+              n_nodes: "@worker_count"
+              m_data_sets: "@code_parameters.m"
+              worker_calculation_type: "@calculation_dtype.name"
+              trials: "@trial_metrics"
+
+        - call: comparison_results.append
+          args: ["@experiment_result"]
 
 code_experiments:
   - name: Non consecutive powers
@@ -32,14 +113,9 @@ code_experiments:
   - name: Circulant Permutation
     code_type: Circulant Permutation
     calculation_type: float64
+    rng: null
 
 sweep:
   stragglers_per_trial: 10
   num_trials: 100
   straggler_seed: 2026
-
-results:
-  trial:
-    _target_: frame_codes.comparison.results.TrialMetrics
-  experiment:
-    _target_: frame_codes.comparison.results.ExperimentResult

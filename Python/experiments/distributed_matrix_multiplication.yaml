@@ -1,6 +1,6 @@
 defaults:
   - simple_band_circulant_init
-  - worker_trial_pipeline
+  - matrix_multiplication_pipeline
   - _self_
 
 init:
@@ -14,28 +14,24 @@ init:
     - [1.0, 1.0]
 
 pipeline:
-  - call: code_family.generate_code
-    args: ["@code_parameters"]
+  - run: "@config.code_input_pipeline"
 
-  - call: numpy.asarray
-    args: ["@lhs"]
-    assign: lhs_array
+  - run: "@config.matrix_multiplication_setup_pipeline"
 
-  - call: numpy.split
-    args: ["@lhs_array", "@code_parameters.m"]
-    kwargs:
-      axis: 0
-    assign: information_set
+  - sweep_results:
+      call: builtins.list
 
-  - call: encoder.encode
-    args: ["@information_set", "@code_family"]
-    assign: encoded_information
+  - for_each:
+      values: "@config.sweep.worker_calculation_types"
+      as: worker_calculation_type
+      steps:
+        - calculation_trials:
+            call: frame_codes.distributed_matrix_multiplication.erasure_sweep.run_erasure_sweep
+            kwargs:
+              workspace: "@workspace"
 
-  - call: functools.partial
-    args: ["@worker_operation"]
-    kwargs:
-      rhs: "@rhs"
-    assign: worker_operation
+        - call: sweep_results.extend
+          args: ["@calculation_trials"]
 
 sweep:
   stragglers_per_trial: 2
