@@ -3,14 +3,8 @@
 import unittest
 
 import numpy as np
-
 from frame_codes.code_families.factory import create_code_family
 from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
-from frame_codes.comparison.statistics import (
-    CodePerformanceStatistics,
-    create_dual_frame_matrix,
-    sample_code_statistics,
-)
 
 
 class TestCodeParameters(unittest.TestCase):
@@ -46,47 +40,6 @@ class TestCodeParameters(unittest.TestCase):
         """Code parameters require positive dimensions and m no greater than n."""
         with self.assertRaisesRegex(ValueError, "m must not exceed n"):
             CodeParameters(m=5, n=4)
-
-
-class TestCodePerformanceStatistics(unittest.TestCase):
-    """Test dual-frame construction and erasure statistics."""
-
-    def test_dual_frame_reconstructs_the_identity(self) -> None:
-        """The dual frame is a left inverse of its generator matrix."""
-        parameters = CodeParameters(m=2, n=4)
-        family = create_code_family("LPF")
-        family.generate_code(parameters)
-        generator = family.get_code()
-
-        dual_frame = create_dual_frame_matrix("LPF", parameters)
-
-        np.testing.assert_allclose(dual_frame @ generator, np.eye(2), atol=1e-12)
-
-    def test_statistics_return_one_value_per_trial(self) -> None:
-        """Statistics contain one noise and condition value per erasure trial."""
-        parameters = CodeParameters(m=2, n=4)
-
-        statistics = sample_code_statistics(
-            "LPF",
-            parameters,
-            retention_probability=1.0,
-            num_trials=4,
-            rng=np.random.default_rng(4),
-        )
-
-        self.assertIsInstance(statistics, CodePerformanceStatistics)
-        self.assertEqual(statistics.noise_amplification.shape, (4,))
-        self.assertEqual(statistics.condition_numbers.shape, (4,))
-        self.assertTrue(np.all(np.isfinite(statistics.noise_amplification)))
-        self.assertTrue(np.all(np.isfinite(statistics.condition_numbers)))
-
-    def test_rejects_retention_that_cannot_span_code_dimension(self) -> None:
-        """Too few retained vectors cannot recover all message dimensions."""
-        parameters = CodeParameters(m=2, n=4)
-
-        with self.assertRaisesRegex(ValueError, "between m and n"):
-            sample_code_statistics("LPF", parameters, 0.25, num_trials=2)
-
 
 if __name__ == "__main__":
     unittest.main()

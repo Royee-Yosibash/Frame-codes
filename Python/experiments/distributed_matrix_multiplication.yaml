@@ -1,5 +1,6 @@
 defaults:
   - simple_band_circulant_init
+  - worker_trial_pipeline
   - _self_
 
 init:

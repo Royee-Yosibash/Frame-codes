@@ -1,5 +1,6 @@
 defaults:
   - pipeline_setup
+  - worker_trial_pipeline
   - _self_
 
 init:
@@ -36,3 +37,9 @@ sweep:
   stragglers_per_trial: 10
   num_trials: 100
   straggler_seed: 2026
+
+results:
+  trial:
+    _target_: frame_codes.comparison.results.TrialMetrics
+  experiment:
+    _target_: frame_codes.comparison.results.ExperimentResult
