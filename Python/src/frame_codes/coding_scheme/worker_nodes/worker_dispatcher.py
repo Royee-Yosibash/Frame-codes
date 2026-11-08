@@ -54,6 +54,10 @@ class WorkerDispatcher:
             for worker_id, parameters in enumerate(parameters_per_worker)
         }
 
+    def reset(self):
+        """Reset the dispatcher for future uses."""
+        self.workers = {}
+
     def dispatch(
         self,
         encoded_information_per_worker: Sequence[EncodedInformation],

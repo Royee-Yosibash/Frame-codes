@@ -1,22 +1,8 @@
-"""Code-comparison configuration, results, and performance statistics."""
+"""Per-trial and experiment-level code-comparison results."""
 
-from frame_codes.comparison.config import ComparisonConfig
-from frame_codes.comparison.results import ComparisonResult, write_comparison_results
-from frame_codes.comparison.statistics import (
-    CodePerformanceStatistics,
-    create_dual_frame_matrix,
-    sample_code_statistics,
-    sample_condition_numbers,
-    select_surviving_worker_ids,
-)
+from frame_codes.comparison.results import ExperimentResult, TrialMetrics
 
 __all__ = [
-    "CodePerformanceStatistics",
-    "ComparisonConfig",
-    "ComparisonResult",
-    "create_dual_frame_matrix",
-    "sample_code_statistics",
-    "sample_condition_numbers",
-    "select_surviving_worker_ids",
-    "write_comparison_results",
+    "ExperimentResult",
+    "TrialMetrics",
 ]
