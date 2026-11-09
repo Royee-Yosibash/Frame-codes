@@ -1,7 +1,10 @@
 """Tests for Hydra construction of the experiment workspace."""
 
-import unittest
 from pathlib import Path
+import unittest
+
+from hydra import compose, initialize_config_dir
+from hydra.utils import instantiate
 
 from frame_codes.code_families.simple_band_circulant import (
     SimpleBandCirculantCode,
@@ -12,8 +15,6 @@ from frame_codes.coding_scheme.decoding.decoders.pseudo_inverse import (
 )
 from frame_codes.coding_scheme.encoding.encoder import Encoder
 from frame_codes.coding_scheme.worker_nodes.worker_dispatcher import WorkerDispatcher
-from hydra import compose, initialize_config_dir
-from hydra.utils import instantiate
 
 
 class TestHydraExperimentInit(unittest.TestCase):

@@ -1,12 +1,13 @@
 """Compare worker precision in one configured matrix multiplication run."""
 
-import unittest
 from pathlib import Path
+import unittest
 
+from hydra import compose, initialize_config_dir
 import numpy as np
+
 from frame_codes.coding_scheme.hydra_pipeline.runner import run_experiment
 from frame_codes.comparison.metrics import relative_frobenius_error
-from hydra import compose, initialize_config_dir
 
 
 class TestHydraMatrixMultiplicationPrecision(unittest.TestCase):

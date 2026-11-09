@@ -3,6 +3,7 @@
 import unittest
 
 import numpy as np
+
 from frame_codes.numerics.matrix_shapes import (
     fix_matrix_dimensions,
     pad_to_partition,
