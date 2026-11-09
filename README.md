@@ -27,3 +27,9 @@ Older exploratory code and examples are kept in [`Matlab/Archive/`](Matlab/Archi
 
 See [`Matlab/README.md`](Matlab/README.md) for the detailed MATLAB project
 structure and workflow notes.
+
+## Python Port
+
+The active non-GUI numerical workflows are being ported to Python. See the
+[`Python README`](Python/README.md) for installation and usage, and the
+[`Python migration plan`](Python/plan.md) for scope and progress.

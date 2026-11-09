@@ -1,9 +1,9 @@
 """End-to-end pipeline test for encoding, worker execution, and decoding."""
 
+import unittest
 from collections.abc import Sequence
 from functools import partial
 from typing import Any, cast
-import unittest
 
 import numpy as np
 

@@ -1,10 +1,10 @@
 """Compare worker precision in one configured matrix multiplication run."""
 
-from pathlib import Path
 import unittest
+from pathlib import Path
 
-from hydra import compose, initialize_config_dir
 import numpy as np
+from hydra import compose, initialize_config_dir
 
 from frame_codes.coding_scheme.hydra_pipeline.runner import run_experiment
 from frame_codes.comparison.metrics import relative_frobenius_error

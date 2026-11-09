@@ -1,8 +1,8 @@
 """Tests for worker dispatch and worker-level straggler handling."""
 
+import unittest
 from collections.abc import Sequence
 from typing import Any
-import unittest
 
 import numpy as np
 

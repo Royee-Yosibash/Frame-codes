@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  checks:
+  lint:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -21,11 +21,29 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install package and check dependencies
-        run: python -m pip install -e ".[test,lint]"
+      - name: Install package and Ruff
+        run: python -m pip install -e ".[lint]"
 
       - name: Lint with Ruff
         run: ruff check src tests
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Python
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package and test dependencies
+        run: python -m pip install -e ".[test]"
 
       - name: Run unit tests
         run: python -m unittest discover -s tests/unit_tests -p 'test_*.py' -v

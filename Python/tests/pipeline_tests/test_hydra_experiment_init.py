@@ -1,7 +1,7 @@
 """Tests for Hydra construction of the experiment workspace."""
 
-from pathlib import Path
 import unittest
+from pathlib import Path
 
 from hydra import compose, initialize_config_dir
 from hydra.utils import instantiate

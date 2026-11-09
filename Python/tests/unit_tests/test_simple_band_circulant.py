@@ -1,7 +1,7 @@
 """Tests for the SimpleBandCirculant code family."""
 
-from itertools import combinations
 import unittest
+from itertools import combinations
 
 import numpy as np
 
