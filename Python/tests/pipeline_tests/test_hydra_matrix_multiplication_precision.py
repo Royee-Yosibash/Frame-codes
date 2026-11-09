@@ -4,10 +4,9 @@ import unittest
 from pathlib import Path
 
 import numpy as np
-from hydra import compose, initialize_config_dir
-
+from frame_codes.coding_scheme.hydra_pipeline.runner import run_experiment
 from frame_codes.comparison.metrics import relative_frobenius_error
-from frame_codes.distributed_matrix_multiplication.runner import run_experiment
+from hydra import compose, initialize_config_dir
 
 
 class TestHydraMatrixMultiplicationPrecision(unittest.TestCase):
