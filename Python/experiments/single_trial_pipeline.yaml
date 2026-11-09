@@ -16,6 +16,7 @@ single_trial_pipeline:
       call: dispatcher.dispatch
       kwargs:
         encoded_information_per_worker: "@encoded_information"
+        worker_kwargs_by_id: "@worker_kwargs_by_id"
 
   - decoded_blocks:
       call: decoder.decode

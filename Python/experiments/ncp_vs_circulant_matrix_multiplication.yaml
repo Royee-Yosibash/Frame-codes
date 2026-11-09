@@ -44,6 +44,35 @@ pipeline:
 
   - run: "@config.matrix_multiplication_setup_pipeline"
 
+  - straggler_rng:
+      call: numpy.random.default_rng
+      kwargs:
+        seed: "@config.sweep.straggler_seed"
+
+  - straggler_sets:
+      call: builtins.list
+
+  - trial_indices:
+      call: builtins.range
+      args: ["@config.sweep.num_trials"]
+
+  - for_each:
+      values: "@trial_indices"
+      steps:
+        - sampled_stragglers:
+            call: straggler_rng.choice
+            kwargs:
+              a: "@code_parameters.n"
+              size: "@config.sweep.stragglers_per_trial"
+              replace: false
+
+        - sorted_stragglers:
+            call: numpy.sort
+            args: ["@sampled_stragglers"]
+
+        - call: straggler_sets.append
+          args: ["@sorted_stragglers"]
+
   - for_each:
       values: "@config.code_experiments"
       as: experiment
@@ -61,10 +90,6 @@ pipeline:
         - run: "@config.code_input_pipeline"
 
         - worker_calculation_type:
-            call: builtins.str
-            args: ["@experiment.calculation_type"]
-
-        - calculation_dtype:
             call: numpy.dtype
             kwargs:
               dtype: "@experiment.calculation_type"
@@ -96,7 +121,7 @@ pipeline:
               code_type: "@experiment.code_type"
               n_nodes: "@worker_count"
               m_data_sets: "@code_parameters.m"
-              worker_calculation_type: "@calculation_dtype.name"
+              worker_calculation_type: "@worker_calculation_type.name"
               trials: "@trial_metrics"
 
         - call: comparison_results.append

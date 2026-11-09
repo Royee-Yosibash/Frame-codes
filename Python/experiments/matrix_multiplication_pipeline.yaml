@@ -22,6 +22,13 @@ code_input_pipeline:
         indices_or_sections: "@encoded_set_count"
         axis: 0
 
+  - worker_count:
+      call: code_family.number_of_workers_required
+
+  - worker_ids:
+      call: builtins.range
+      args: ["@worker_count"]
+
 matrix_multiplication_setup_pipeline:
   - worker_operation:
       call: functools.partial
@@ -33,6 +40,47 @@ matrix_multiplication_setup_pipeline:
       call: frame_codes.coding_scheme.worker_nodes.operation_wrappers.with_deterministic_straggler
       kwargs:
         operation: "@worker_operation"
+
+worker_config_setup_pipeline:
+  - worker_configurations:
+      call: builtins.list
+
+  - worker_kwargs_entries:
+      call: builtins.list
+
+  - for_each:
+      values: "@worker_ids"
+      as: worker_id
+      steps:
+        - worker_configuration:
+            call: frame_codes.coding_scheme.worker_nodes.worker_node.WorkerNodeConfig
+            kwargs:
+              operation: "@worker_operation"
+              calculation_type: "@worker_calculation_type"
+
+        - worker_is_straggler:
+            call: operator.contains
+            args: ["@straggler_worker_ids", "@worker_id"]
+
+        - worker_kwargs:
+            call: builtins.dict
+            kwargs:
+              straggle: "@worker_is_straggler"
+
+        - worker_kwargs_entry:
+            call: builtins.tuple
+            args:
+              - ["@worker_id", "@worker_kwargs"]
+
+        - call: worker_kwargs_entries.append
+          args: ["@worker_kwargs_entry"]
+
+        - call: worker_configurations.append
+          args: ["@worker_configuration"]
+
+  - worker_kwargs_by_id:
+      call: builtins.dict
+      args: ["@worker_kwargs_entries"]
 
 post_trial_pipeline:
   - result:

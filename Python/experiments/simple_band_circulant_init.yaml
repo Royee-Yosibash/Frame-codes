@@ -1,4 +1,5 @@
 defaults:
+  - pipeline_setup
   - matrix_multiplication_worker_init
   - _self_
 
@@ -13,12 +14,3 @@ init:
     _target_: frame_codes.coding_scheme.codes.code_parameters.CodeParameters
     m: 3
     n: 6
-
-  encoder:
-    _target_: frame_codes.coding_scheme.encoding.encoder.Encoder
-
-  dispatcher:
-    _target_: frame_codes.coding_scheme.worker_nodes.worker_dispatcher.WorkerDispatcher
-
-  decoder:
-    _target_: frame_codes.coding_scheme.decoding.decoders.pseudo_inverse.PseudoInverseDecoder

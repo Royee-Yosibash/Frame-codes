@@ -18,6 +18,14 @@ pipeline:
 
   - run: "@config.matrix_multiplication_setup_pipeline"
 
+  - straggler_combinations:
+      call: itertools.combinations
+      args: ["@worker_ids", "@config.sweep.stragglers_per_trial"]
+
+  - straggler_sets:
+      call: builtins.list
+      args: ["@straggler_combinations"]
+
   - sweep_results:
       call: builtins.list
 
