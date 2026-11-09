@@ -5,10 +5,9 @@ from itertools import combinations
 from pathlib import Path
 
 import numpy as np
+from frame_codes.distributed_matrix_multiplication.runner import run_experiment
 from hydra import compose, initialize_config_dir
 from omegaconf import DictConfig, OmegaConf
-
-from frame_codes.distributed_matrix_multiplication.runner import run_experiment
 
 
 class TestHydraDistributedMatrixMultiplication(unittest.TestCase):
@@ -23,7 +22,7 @@ class TestHydraDistributedMatrixMultiplication(unittest.TestCase):
         """
         config_directory = Path(__file__).resolve().parents[2] / "experiments"
         with initialize_config_dir(version_base=None, config_dir=str(config_directory)):
-            return compose(config_name="distributed_matrix_multiplication")
+            return compose(config_name="simple_band_circulant_matrix_multiplication")
 
     def test_matrix_rhs_runs_full_distributed_pipeline(self) -> None:
         """Every two-worker straggler pair decodes the matrix-RHS product."""

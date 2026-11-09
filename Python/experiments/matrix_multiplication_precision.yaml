@@ -1,5 +1,5 @@
 defaults:
-  - distributed_matrix_multiplication
+  - simple_band_circulant_matrix_multiplication
   - _self_
 
 init:

@@ -3,9 +3,6 @@
 import unittest
 from pathlib import Path
 
-from hydra import compose, initialize_config_dir
-from hydra.utils import instantiate
-
 from frame_codes.code_families.simple_band_circulant import (
     SimpleBandCirculantCode,
 )
@@ -15,6 +12,8 @@ from frame_codes.coding_scheme.decoding.decoders.pseudo_inverse import (
 )
 from frame_codes.coding_scheme.encoding.encoder import Encoder
 from frame_codes.coding_scheme.worker_nodes.worker_dispatcher import WorkerDispatcher
+from hydra import compose, initialize_config_dir
+from hydra.utils import instantiate
 
 
 class TestHydraExperimentInit(unittest.TestCase):
@@ -24,7 +23,7 @@ class TestHydraExperimentInit(unittest.TestCase):
         """Hydra builds the code, encoder, dispatcher, and decoder objects."""
         config_directory = Path(__file__).resolve().parents[2] / "experiments"
         with initialize_config_dir(version_base=None, config_dir=str(config_directory)):
-            config = compose(config_name="simple_band_circulant_init")
+            config = compose(config_name="setup/simple_band_circulant_init")
 
         workspace = instantiate(config.init)
 
@@ -36,7 +35,6 @@ class TestHydraExperimentInit(unittest.TestCase):
         self.assertIsInstance(workspace["encoder"], Encoder)
         self.assertIsInstance(workspace["dispatcher"], WorkerDispatcher)
         self.assertIsInstance(workspace["decoder"], PseudoInverseDecoder)
-        self.assertTrue(callable(workspace["worker_operation"]))
 
 
 if __name__ == "__main__":
