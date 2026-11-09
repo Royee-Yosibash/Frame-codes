@@ -18,6 +18,9 @@ dependencies = [
 test = ["pytest>=7.4"]
 lint = ["ruff>=0.11"]
 
+[tool.ruff]
+src = ["src"]
+
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["frame_codes*"]
