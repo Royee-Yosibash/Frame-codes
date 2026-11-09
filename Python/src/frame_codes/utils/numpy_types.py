@@ -20,6 +20,8 @@ def as_inexact_array(values: ArrayLike) -> NDArray[np.float64] | NDArray[np.comp
     """
     array = np.asarray(values)
     if array.dtype.kind not in "biufc":
-        raise TypeError("Values must have a boolean, integer, floating, or complex dtype")
+        raise TypeError(
+            "Values must have a boolean, integer, floating, or complex dtype"
+        )
     dtype = np.complex128 if array.dtype.kind == "c" else np.float64
     return np.asarray(array, dtype=dtype)

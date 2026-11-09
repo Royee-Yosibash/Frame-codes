@@ -37,9 +37,7 @@ class PseudoInverseDecoder(AbstractDecoder):
         for result in worker_results:
             code_rows = code_family.get_code_rows_for_worker(result.worker_id)
             worker_code_rows.extend(code_rows)
-            worker_outputs.extend(
-                as_inexact_array(value) for value in result.values
-            )
+            worker_outputs.extend(as_inexact_array(value) for value in result.values)
         surviving_code = as_inexact_array(np.asarray(worker_code_rows))
         if np.linalg.matrix_rank(surviving_code) < code_family.number_of_encoded_sets():
             raise ValueError("Surviving workers cannot recover every encoded set")

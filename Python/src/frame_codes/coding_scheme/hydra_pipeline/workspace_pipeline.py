@@ -89,10 +89,7 @@ class WorkspacePipeline:
         if isinstance(value, str) and value.startswith("@"):
             return self._resolve_workspace_path(value[1:])
         if isinstance(value, Mapping):
-            return {
-                key: self._resolve_value(item)
-                for key, item in value.items()
-            }
+            return {key: self._resolve_value(item) for key, item in value.items()}
         if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
             return [self._resolve_value(item) for item in value]
         return value

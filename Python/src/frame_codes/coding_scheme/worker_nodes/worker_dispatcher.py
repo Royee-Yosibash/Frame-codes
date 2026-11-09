@@ -26,8 +26,7 @@ class WorkerDispatcher:
     """Coordinate worker execution and simulate which results are returned."""
 
     def __init__(self):
-        """Store the persistent worker pool and response models.
-        """
+        """Store the persistent worker pool and response models."""
         self.workers: Mapping[int, WorkerNode] = {}
 
     def setup(
@@ -72,7 +71,9 @@ class WorkerDispatcher:
         Returns:
             Results from workers whose operations returned answers.
         """
-        workers_information = self._consolidate_information(encoded_information_per_worker)
+        workers_information = self._consolidate_information(
+            encoded_information_per_worker
+        )
         return self._run_workers(workers_information, worker_kwargs_by_id or {})
 
     @staticmethod

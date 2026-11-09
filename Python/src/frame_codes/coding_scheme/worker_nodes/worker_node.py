@@ -122,9 +122,7 @@ class WorkerNode:
                     raise TypeError(
                         "information dtype cannot be cast to worker using same-kind casting"
                     )
-                numeric_information = numeric_information.astype(
-                    calculation_type
-                )[()]
+                numeric_information = numeric_information.astype(calculation_type)[()]
             calculation_information.append(numeric_information)
         return self._configuration.operation(
             information=calculation_information,

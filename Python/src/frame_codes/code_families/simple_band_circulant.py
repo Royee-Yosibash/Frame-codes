@@ -59,10 +59,11 @@ class SimpleBandCirculantCode(CodeFamily):
             parameters.m * band_count for band_count in range(1, parameters.m)
         }
         terminal_band_worker_counts = {
-            parameters.m * band_count + 1
-            for band_count in range(1, parameters.m)
+            parameters.m * band_count + 1 for band_count in range(1, parameters.m)
         }
-        supported_worker_counts = regular_band_worker_counts | terminal_band_worker_counts
+        supported_worker_counts = (
+            regular_band_worker_counts | terminal_band_worker_counts
+        )
         if parameters.n not in supported_worker_counts:
             raise ValueError(
                 "n must match a supported SimpleBandCirculantCode band count"

@@ -32,7 +32,9 @@ class Encoder:
         return [
             EncodedInformation(
                 information_id=worker_id,
-                weighted_information=code_family.encode_for_worker(worker_id, information_set),
+                weighted_information=code_family.encode_for_worker(
+                    worker_id, information_set
+                ),
             )
             for worker_id in range(worker_count)
         ]
