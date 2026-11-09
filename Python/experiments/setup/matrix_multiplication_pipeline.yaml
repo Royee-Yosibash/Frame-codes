@@ -1,3 +1,4 @@
+# @package _global_
 defaults:
   - single_trial_pipeline
   - _self_
@@ -30,6 +31,11 @@ code_input_pipeline:
       args: ["@worker_count"]
 
 matrix_multiplication_setup_pipeline:
+  - worker_operation:
+      call: hydra.utils.get_method
+      kwargs:
+        path: frame_codes.distributed_matrix_multiplication.operations.matrix_product
+
   - worker_operation:
       call: functools.partial
       args: ["@worker_operation"]
@@ -88,3 +94,58 @@ post_trial_pipeline:
       args: ["@decoded_blocks"]
       kwargs:
         axis: 0
+
+trial_sweep_pipeline:
+  - trial_records:
+      call: builtins.list
+
+  - worker_calculation_dtype:
+      call: numpy.dtype
+      kwargs:
+        dtype: "@worker_calculation_type"
+
+  - straggler_trial_entries:
+      call: builtins.enumerate
+      args: ["@straggler_sets"]
+
+  - worker_id_getter:
+      call: operator.attrgetter
+      args: ["worker_id"]
+
+  - for_each:
+      values: "@straggler_trial_entries"
+      as: trial_entry
+      steps:
+        - trial_index:
+            call: operator.getitem
+            args: ["@trial_entry", 0]
+
+        - straggler_worker_ids:
+            call: operator.getitem
+            args: ["@trial_entry", 1]
+
+        - run: "@config.worker_config_setup_pipeline"
+
+        - run: "@config.single_trial_pipeline"
+
+        - run: "@config.post_trial_pipeline"
+
+        - responding_worker_ids:
+            call: builtins.map
+            args: ["@worker_id_getter", "@worker_results"]
+
+        - responding_worker_ids:
+            call: builtins.tuple
+            args: ["@responding_worker_ids"]
+
+        - trial_record:
+            call: builtins.dict
+            kwargs:
+              trial_index: "@trial_index"
+              straggler_worker_ids: "@straggler_worker_ids"
+              responding_worker_ids: "@responding_worker_ids"
+              worker_calculation_type: "@worker_calculation_dtype.name"
+              result: "@result"
+
+        - call: trial_records.append
+          args: ["@trial_record"]

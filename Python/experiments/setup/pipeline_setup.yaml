@@ -1,3 +1,4 @@
+# @package _global_
 init:
   encoder:
     _target_: frame_codes.coding_scheme.encoding.encoder.Encoder

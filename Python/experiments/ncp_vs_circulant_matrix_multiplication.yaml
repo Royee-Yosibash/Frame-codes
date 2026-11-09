@@ -1,7 +1,6 @@
 defaults:
-  - pipeline_setup
-  - matrix_multiplication_worker_init
-  - matrix_multiplication_pipeline
+  - setup/pipeline_setup
+  - setup/matrix_multiplication_pipeline
   - _self_
 
 results:
@@ -97,17 +96,25 @@ pipeline:
         - trial_metrics:
             call: builtins.list
 
-        - experiment_trials:
-            call: frame_codes.distributed_matrix_multiplication.erasure_sweep.run_erasure_sweep
-            kwargs:
-              workspace: "@workspace"
+        - run: "@config.trial_sweep_pipeline"
 
         - for_each:
-            values: "@experiment_trials"
+            values: "@trial_records"
             as: trial
             steps:
+              - trial_metric:
+                  call: hydra.utils.instantiate
+                  args: ["@config.results.trial"]
+                  kwargs:
+                    expected_result: "@reference_result"
+                    actual_result: "@trial.result"
+                    trial_index: "@trial.trial_index"
+                    straggler_worker_ids: "@trial.straggler_worker_ids"
+                    responding_worker_ids: "@trial.responding_worker_ids"
+                    worker_calculation_type: "@trial.worker_calculation_type"
+
               - call: trial_metrics.append
-                args: ["@trial.trial_result"]
+                args: ["@trial_metric"]
 
         - experiment_result_type:
             call: hydra.utils.get_method

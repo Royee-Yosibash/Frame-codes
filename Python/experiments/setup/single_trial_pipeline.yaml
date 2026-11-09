@@ -1,3 +1,4 @@
+# @package _global_
 single_trial_pipeline:
   - call: dispatcher.reset
 

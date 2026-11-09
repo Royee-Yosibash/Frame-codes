@@ -1,6 +1,5 @@
 defaults:
-  - simple_band_circulant_init
-  - matrix_multiplication_pipeline
+  - setup/simple_band_circulant_init
   - _self_
 
 init:
@@ -33,13 +32,10 @@ pipeline:
       values: "@config.sweep.worker_calculation_types"
       as: worker_calculation_type
       steps:
-        - calculation_trials:
-            call: frame_codes.distributed_matrix_multiplication.erasure_sweep.run_erasure_sweep
-            kwargs:
-              workspace: "@workspace"
+        - run: "@config.trial_sweep_pipeline"
 
         - call: sweep_results.extend
-          args: ["@calculation_trials"]
+          args: ["@trial_records"]
 
 sweep:
   stragglers_per_trial: 2

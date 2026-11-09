@@ -1,6 +1,7 @@
+# @package _global_
 defaults:
   - pipeline_setup
-  - matrix_multiplication_worker_init
+  - matrix_multiplication_pipeline
   - _self_
 
 init:
