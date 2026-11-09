@@ -5,11 +5,11 @@ one configuration per worker. `dispatch()` applies coefficients, groups encoded
 information by worker ID, executes each worker's operations and returns results
 only from workers that answered.
 
-Worker calls receive the information only; the dispatcher does not forward
-additional operation arguments.
+Optional operation keyword arguments are supplied by worker ID at dispatch.
 """
 
 from collections.abc import Mapping, Sequence
+from typing import Any
 
 from frame_codes.coding_scheme.state_utils.information import (
     EncodedInformation,
@@ -61,17 +61,19 @@ class WorkerDispatcher:
     def dispatch(
         self,
         encoded_information_per_worker: Sequence[EncodedInformation],
+        worker_kwargs_by_id: Mapping[int, Mapping[str, Any]] | None = None,
     ) -> list[WorkerResult]:
         """Run workers and omit any worker that returns a failed answer.
 
         Args:
             encoded_information_per_worker: One encoded-information record per worker.
+            worker_kwargs_by_id: Operation keyword arguments indexed by worker ID.
 
         Returns:
             Results from workers whose operations returned answers.
         """
-        worker_information = self._consolidate_information(encoded_information_per_worker)
-        return self._run_workers(worker_information)
+        workers_information = self._consolidate_information(encoded_information_per_worker)
+        return self._run_workers(workers_information, worker_kwargs_by_id or {})
 
     @staticmethod
     def _consolidate_information(
@@ -96,11 +98,13 @@ class WorkerDispatcher:
     def _run_workers(
         self,
         worker_information: Mapping[int, Sequence[Sequence[Information]]],
+        worker_kwargs_by_id: Mapping[int, Mapping[str, Any]],
     ) -> list[WorkerResult]:
         """Execute all workers from their consolidated information inputs.
 
         Args:
             worker_information: Inputs grouped by worker ID and encoded information.
+            worker_kwargs_by_id: Operation keyword arguments indexed by worker ID.
 
         Returns:
             Results from workers that returned answers for all encoded information.
@@ -108,9 +112,10 @@ class WorkerDispatcher:
         worker_results = []
         for worker_id, information_sequence in worker_information.items():
             worker = self.workers[worker_id]
+            worker_kwargs = worker_kwargs_by_id.get(worker_id, {})
             values = []
             for information in information_sequence:
-                value = worker.execute(information=information)
+                value = worker.execute(information=information, **worker_kwargs)
                 if value is None:
                     break
                 values.append(value)

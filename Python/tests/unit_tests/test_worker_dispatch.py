@@ -2,8 +2,7 @@
 
 import unittest
 from collections.abc import Sequence
-from functools import partial
-from typing import Any, cast
+from typing import Any
 
 import numpy as np
 
@@ -17,7 +16,6 @@ from frame_codes.coding_scheme.worker_nodes.operation_wrappers import (
 from frame_codes.coding_scheme.worker_nodes.worker_dispatcher import WorkerDispatcher
 from frame_codes.coding_scheme.worker_nodes.worker_node import (
     WorkerNodeConfig,
-    WorkerOperation,
 )
 
 
@@ -62,18 +60,22 @@ class TestWorkerDispatch(unittest.TestCase):
         operation = with_deterministic_straggler(self._sum_information)
         worker_parameters = [
             WorkerNodeConfig(
-                operation=cast(
-                    WorkerOperation,
-                    partial(operation, straggle=(worker_id == 0)),
-                ),
+                operation=operation,
                 calculation_type=code_family.get_code().dtype,
             )
-            for worker_id in range(worker_count)
+            for _ in range(worker_count)
         ]
+        worker_kwargs_by_id = {
+            worker_id: {"straggle": worker_id == 0}
+            for worker_id in range(worker_count)
+        }
         dispatcher = WorkerDispatcher()
         dispatcher.setup(worker_count, worker_parameters)
 
-        results = dispatcher.dispatch(encoded_workers)
+        results = dispatcher.dispatch(
+            encoded_workers,
+            worker_kwargs_by_id=worker_kwargs_by_id,
+        )
 
         self.assertEqual(len(results), worker_count - 1)
         self.assertEqual(
