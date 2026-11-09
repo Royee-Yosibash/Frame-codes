@@ -40,25 +40,30 @@ class TrialMetrics:
             worker_calculation_type: Calculation dtype used by the workers.
 
         Raises:
-            ValueError: If the result shapes differ or the reference has zero
-                squared magnitude.
+            ValueError: If the result shapes differ or either result has a zero
+                squared norm.
             TypeError: If either result has an unsupported numeric dtype.
         """
         expected = as_inexact_array(expected_result)
         actual = as_inexact_array(actual_result)
         if expected.shape != actual.shape:
             raise ValueError("actual and expected must have matching shapes")
-        expected_energy = np.sum(np.abs(expected) ** 2)
-        if expected_energy == 0:
+        expected_squared_norm = np.sum(np.abs(expected) ** 2)
+        if expected_squared_norm == 0:
             raise ValueError("expected result must have nonzero Frobenius norm")
-        error_energy = np.sum(np.abs(actual - expected) ** 2)
+        actual_squared_norm = np.sum(np.abs(actual) ** 2)
+        if actual_squared_norm == 0:
+            raise ValueError("actual result must have nonzero Frobenius norm")
+        error_squared_norm = np.sum(np.abs(actual - expected) ** 2)
 
         self.trial_index = trial_index
         self.straggler_worker_ids = tuple(straggler_worker_ids)
         self.responding_worker_ids = tuple(responding_worker_ids)
         self.worker_calculation_type = worker_calculation_type
-        self.mse = float(error_energy / expected_energy)
-        self.relative_frobenius_error = float(np.sqrt(error_energy / expected_energy))
+        self.mse = float(error_squared_norm / actual_squared_norm)
+        self.relative_frobenius_error = float(
+            np.sqrt(error_squared_norm / expected_squared_norm)
+        )
 
 
 @dataclass
