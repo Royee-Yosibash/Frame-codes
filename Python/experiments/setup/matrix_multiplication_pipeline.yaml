@@ -1,0 +1,151 @@
+# @package _global_
+defaults:
+  - single_trial_pipeline
+  - _self_
+
+code_input_pipeline:
+  - call: code_family.generate_code
+    kwargs:
+      parameters: "@code_parameters"
+
+  - lhs_array:
+      call: numpy.asarray
+      kwargs:
+        a: "@lhs"
+
+  - encoded_set_count:
+      call: code_family.number_of_encoded_sets
+
+  - information_set:
+      call: numpy.split
+      kwargs:
+        ary: "@lhs_array"
+        indices_or_sections: "@encoded_set_count"
+        axis: 0
+
+  - worker_count:
+      call: code_family.number_of_workers_required
+
+  - worker_ids:
+      call: builtins.range
+      args: ["@worker_count"]
+
+matrix_multiplication_setup_pipeline:
+  - worker_operation:
+      call: hydra.utils.get_method
+      kwargs:
+        path: frame_codes.distributed_matrix_multiplication.operations.matrix_product
+
+  - worker_operation:
+      call: functools.partial
+      args: ["@worker_operation"]
+      kwargs:
+        rhs: "@rhs"
+
+  - worker_operation:
+      call: frame_codes.coding_scheme.worker_nodes.operation_wrappers.with_deterministic_straggler
+      kwargs:
+        operation: "@worker_operation"
+
+worker_config_setup_pipeline:
+  - worker_configurations:
+      call: builtins.list
+
+  - worker_kwargs_entries:
+      call: builtins.list
+
+  - for_each:
+      values: "@worker_ids"
+      as: worker_id
+      steps:
+        - worker_configuration:
+            call: frame_codes.coding_scheme.worker_nodes.worker_node.WorkerNodeConfig
+            kwargs:
+              operation: "@worker_operation"
+              calculation_type: "@worker_calculation_type"
+
+        - worker_is_straggler:
+            call: operator.contains
+            args: ["@straggler_worker_ids", "@worker_id"]
+
+        - worker_kwargs:
+            call: builtins.dict
+            kwargs:
+              straggle: "@worker_is_straggler"
+
+        - worker_kwargs_entry:
+            call: builtins.tuple
+            args:
+              - ["@worker_id", "@worker_kwargs"]
+
+        - call: worker_kwargs_entries.append
+          args: ["@worker_kwargs_entry"]
+
+        - call: worker_configurations.append
+          args: ["@worker_configuration"]
+
+  - worker_kwargs_by_id:
+      call: builtins.dict
+      args: ["@worker_kwargs_entries"]
+
+post_trial_pipeline:
+  - result:
+      call: numpy.concatenate
+      args: ["@decoded_blocks"]
+      kwargs:
+        axis: 0
+
+trial_sweep_pipeline:
+  - trial_records:
+      call: builtins.list
+
+  - worker_calculation_dtype:
+      call: numpy.dtype
+      kwargs:
+        dtype: "@worker_calculation_type"
+
+  - straggler_trial_entries:
+      call: builtins.enumerate
+      args: ["@straggler_sets"]
+
+  - worker_id_getter:
+      call: operator.attrgetter
+      args: ["worker_id"]
+
+  - for_each:
+      values: "@straggler_trial_entries"
+      as: trial_entry
+      steps:
+        - trial_index:
+            call: operator.getitem
+            args: ["@trial_entry", 0]
+
+        - straggler_worker_ids:
+            call: operator.getitem
+            args: ["@trial_entry", 1]
+
+        - run: "@config.worker_config_setup_pipeline"
+
+        - run: "@config.single_trial_pipeline"
+
+        - run: "@config.post_trial_pipeline"
+
+        - responding_worker_ids:
+            call: builtins.map
+            args: ["@worker_id_getter", "@worker_results"]
+
+        - responding_worker_ids:
+            call: builtins.tuple
+            args: ["@responding_worker_ids"]
+
+        - trial_record:
+            call: builtins.dict
+            kwargs:
+              trial_index: "@trial_index"
+              straggler_worker_ids: "@straggler_worker_ids"
+              responding_worker_ids: "@responding_worker_ids"
+              worker_calculation_type: "@worker_calculation_dtype.name"
+              result: "@result"
+
+        - call: trial_records.append
+          args: ["@trial_record"]

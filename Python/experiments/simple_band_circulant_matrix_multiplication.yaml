@@ -1,0 +1,43 @@
+defaults:
+  - setup/simple_band_circulant_init
+  - _self_
+
+init:
+  lhs:
+    - [1.0, 2.0, 0.0]
+    - [0.0, -1.0, 3.0]
+    - [4.0, 1.0, 2.0]
+  rhs:
+    - [1.0, 0.0]
+    - [0.0, 1.0]
+    - [1.0, 1.0]
+
+pipeline:
+  - run: "@config.code_input_pipeline"
+
+  - run: "@config.matrix_multiplication_setup_pipeline"
+
+  - straggler_combinations:
+      call: itertools.combinations
+      args: ["@worker_ids", "@config.sweep.stragglers_per_trial"]
+
+  - straggler_sets:
+      call: builtins.list
+      args: ["@straggler_combinations"]
+
+  - sweep_results:
+      call: builtins.list
+
+  - for_each:
+      values: "@config.sweep.worker_calculation_types"
+      as: worker_calculation_type
+      steps:
+        - run: "@config.trial_sweep_pipeline"
+
+        - call: sweep_results.extend
+          args: ["@trial_records"]
+
+sweep:
+  stragglers_per_trial: 2
+  worker_calculation_types:
+    - float64
