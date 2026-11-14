@@ -1,1 +1,0 @@
-"""Product encoding operations."""
