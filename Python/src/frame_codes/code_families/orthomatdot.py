@@ -3,10 +3,9 @@
 from functools import cache
 
 import numpy as np
+from codedcompute.codes.code_family import CodeFamily
+from codedcompute.codes.code_parameters import CodeParameters
 from numpy.typing import NDArray
-
-from frame_codes.coding_scheme.codes.code_family import CodeFamily
-from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 
 
 class OrthoMatDotCodeFamily(CodeFamily):

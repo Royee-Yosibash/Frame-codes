@@ -13,7 +13,7 @@ init:
   _target_: builtins.dict
 
   code_parameters:
-    _target_: frame_codes.coding_scheme.codes.code_parameters.CodeParameters
+    _target_: codedcompute.codes.code_parameters.CodeParameters
     m: 80
     n: 100
 

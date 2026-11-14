@@ -12,6 +12,6 @@ init:
     code_type: SimpleBandCirculantCode
 
   code_parameters:
-    _target_: frame_codes.coding_scheme.codes.code_parameters.CodeParameters
+    _target_: codedcompute.codes.code_parameters.CodeParameters
     m: 3
     n: 6

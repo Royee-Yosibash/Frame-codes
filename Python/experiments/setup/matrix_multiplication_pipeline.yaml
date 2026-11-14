@@ -43,7 +43,7 @@ matrix_multiplication_setup_pipeline:
         rhs: "@rhs"
 
   - worker_operation:
-      call: frame_codes.coding_scheme.worker_nodes.operation_wrappers.with_deterministic_straggler
+      call: codedcompute.worker_nodes.operation_wrappers.with_deterministic_straggler
       kwargs:
         operation: "@worker_operation"
 
@@ -59,7 +59,7 @@ worker_config_setup_pipeline:
       as: worker_id
       steps:
         - worker_configuration:
-            call: frame_codes.coding_scheme.worker_nodes.worker_node.WorkerNodeConfig
+            call: codedcompute.worker_nodes.worker_node.WorkerNodeConfig
             kwargs:
               operation: "@worker_operation"
               calculation_type: "@worker_calculation_type"

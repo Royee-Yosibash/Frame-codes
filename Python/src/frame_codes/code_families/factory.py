@@ -1,6 +1,7 @@
 """Factory for selecting concrete code-families implementations."""
 
 import numpy as np
+from codedcompute.codes.code_family import CodeFamily, RandomCodeFamily
 
 from frame_codes.code_families.circulant_permutation import (
     CirculantPermutationCodeFamily,
@@ -20,7 +21,6 @@ from frame_codes.code_families.vandermonde import (
     VandermondeCodeFamily,
 )
 from frame_codes.code_families.wishart import WishartCodeFamily
-from frame_codes.coding_scheme.codes.code_family import CodeFamily, RandomCodeFamily
 
 CODE_FAMILY_TYPES: dict[CodeType, type[CodeFamily]] = {
     CodeType.LPF: LowPassFourierCodeFamily,

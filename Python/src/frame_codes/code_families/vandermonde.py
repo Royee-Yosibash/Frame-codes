@@ -3,10 +3,9 @@
 from functools import cache
 
 import numpy as np
+from codedcompute.codes.code_family import RandomCodeFamily
+from codedcompute.codes.code_parameters import CodeParameters
 from numpy.typing import NDArray
-
-from frame_codes.coding_scheme.codes.code_family import RandomCodeFamily
-from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 
 
 class VandermondeCodeFamily(RandomCodeFamily):
