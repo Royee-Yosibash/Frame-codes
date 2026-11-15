@@ -5,10 +5,9 @@ from itertools import combinations
 from pathlib import Path
 
 import numpy as np
+from codedcompute.hydra_pipeline.runner import run_experiment
 from hydra import compose, initialize_config_dir
 from omegaconf import DictConfig, OmegaConf
-
-from frame_codes.coding_scheme.hydra_pipeline.runner import run_experiment
 
 
 class TestHydraDistributedMatrixMultiplication(unittest.TestCase):

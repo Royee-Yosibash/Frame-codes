@@ -4,9 +4,8 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 
 import numpy as np
+from codedcompute.utils.numpy_types import as_inexact_array
 from numpy.typing import ArrayLike
-
-from frame_codes.utils.numpy_types import as_inexact_array
 
 
 @dataclass(init=False)

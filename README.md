@@ -1,5 +1,7 @@
 # Frame-codes
 
+Repository release: v0.2.0, November 15, 2026.
+
 This repository contains the code used to create and show the results in
 Royee Yosibash's master thesis, *Irregular Polynomial Codes for Coded
 Computation with Numerical Stability and Graceful Degradation*.
@@ -30,6 +32,8 @@ structure and workflow notes.
 
 ## Python Port
 
-The active non-GUI numerical workflows are being ported to Python. See the
-[`Python README`](Python/README.md) for installation and usage, and the
-[`Python migration plan`](Python/plan.md) for scope and progress.
+The non-GUI numerical workflows are also available in Python. See the
+[`Python README`](Python/README.md) for installation and usage.
+The Python implementation depends on
+[`codedcompute`](https://github.com/Royee-Yosibash/codedcompute) for the
+coded-computation simulation framework and Hydra experiment runner.

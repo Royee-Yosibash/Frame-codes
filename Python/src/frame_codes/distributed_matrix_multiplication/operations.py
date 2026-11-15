@@ -4,9 +4,8 @@ from collections.abc import Sequence
 from typing import Any
 
 import numpy as np
+from codedcompute.state_utils.information import Information
 from numpy.typing import ArrayLike, NDArray
-
-from frame_codes.coding_scheme.state_utils.information import Information
 
 
 def matrix_product(

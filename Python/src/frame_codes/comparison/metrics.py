@@ -1,9 +1,8 @@
 """Mathematical error and norm metrics for numerical workflows."""
 
 import numpy as np
+from codedcompute.utils.numpy_types import as_inexact_array
 from numpy.typing import ArrayLike
-
-from frame_codes.utils.numpy_types import as_inexact_array
 
 
 def frobenius_norm(matrix: ArrayLike) -> float:

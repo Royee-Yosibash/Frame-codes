@@ -1,10 +1,10 @@
 # @package _global_
 init:
   encoder:
-    _target_: frame_codes.coding_scheme.encoding.encoder.Encoder
+    _target_: codedcompute.encoding.encoder.Encoder
 
   dispatcher:
-    _target_: frame_codes.coding_scheme.worker_nodes.worker_dispatcher.WorkerDispatcher
+    _target_: codedcompute.worker_nodes.worker_dispatcher.WorkerDispatcher
 
   decoder:
-    _target_: frame_codes.coding_scheme.decoding.decoders.pseudo_inverse.PseudoInverseDecoder
+    _target_: codedcompute.decoding.decoders.pseudo_inverse.PseudoInverseDecoder

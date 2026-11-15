@@ -1,12 +1,10 @@
 """Matrix padding and partitioning utilities."""
 
 from math import lcm
-from typing import Literal
 
 import numpy as np
+from codedcompute.numerics.matrix_shapes import MatrixAxis
 from numpy.typing import ArrayLike, NDArray
-
-MatrixAxis = Literal["row", "column"]
 
 
 def pad_to_partition(

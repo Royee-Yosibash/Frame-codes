@@ -4,10 +4,9 @@ from abc import ABC
 from functools import cache
 
 import numpy as np
+from codedcompute.codes.code_family import CodeFamily, RandomCodeFamily
+from codedcompute.codes.code_parameters import CodeParameters
 from numpy.typing import NDArray
-
-from frame_codes.coding_scheme.codes.code_family import CodeFamily, RandomCodeFamily
-from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 
 
 class FourierCodeFamily(CodeFamily, ABC):

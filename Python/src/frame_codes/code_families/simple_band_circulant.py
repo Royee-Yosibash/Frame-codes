@@ -32,10 +32,9 @@ contains (b_m + 1)(b_m + 2) / 2 '1's, and another if the terminal band is presen
 """
 
 import numpy as np
+from codedcompute.codes.code_family import CodeFamily
+from codedcompute.codes.code_parameters import CodeParameters
 from numpy.typing import NDArray
-
-from frame_codes.coding_scheme.codes.code_family import CodeFamily
-from frame_codes.coding_scheme.codes.code_parameters import CodeParameters
 
 
 class SimpleBandCirculantCode(CodeFamily):

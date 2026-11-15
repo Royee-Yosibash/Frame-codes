@@ -7,7 +7,6 @@ import numpy as np
 from frame_codes.numerics.linear_algebra import (
     gram_matrix_condition_number,
     gram_matrix_eigenvalues,
-    normalize_code,
 )
 
 
@@ -53,33 +52,6 @@ class TestGramMatrixConditionNumber(unittest.TestCase):
         matrix = np.array([[1.0, 2.0], [2.0, 4.0]])
 
         self.assertTrue(np.isinf(gram_matrix_condition_number(matrix)))
-
-
-class TestNormalizeCode(unittest.TestCase):
-    """Test row and column normalization across numeric dtypes."""
-
-    def test_normalizes_integer_rows(self) -> None:
-        """Integer matrices are promoted and each row has unit norm."""
-        matrix = np.array([[3, 4], [5, 12]], dtype=np.int32)
-
-        normalized = normalize_code(matrix, "row")
-
-        self.assertEqual(normalized.dtype, np.float64)
-        np.testing.assert_allclose(np.linalg.norm(normalized, axis=1), 1)
-
-    def test_normalizes_complex_columns(self) -> None:
-        """Complex columns have unit norm after normalization."""
-        matrix = np.array([[3 + 4j, 0], [0, 5j]], dtype=np.complex64)
-
-        normalized = normalize_code(matrix, "column")
-
-        self.assertEqual(normalized.dtype, np.complex128)
-        np.testing.assert_allclose(np.linalg.norm(normalized, axis=0), 1)
-
-    def test_rejects_zero_norm_vectors(self) -> None:
-        """A zero vector cannot be normalized."""
-        with self.assertRaisesRegex(ValueError, "zero-norm"):
-            normalize_code(np.zeros((2, 2)), "row")
 
 
 if __name__ == "__main__":
